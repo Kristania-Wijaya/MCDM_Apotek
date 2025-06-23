@@ -18,7 +18,7 @@ with st.sidebar:
     cari = st.button("📍 Proses Rekomendasi")
 
 # --- API KEY & Data Apotek
-API_KEY = "ISI_API_KEY_MU_DISINI"
+API_KEY = "AIzaSyBqMqXOO-8ZrsSPMQXMeUVYmG-zDHnKeL0"
 apotek_list = [
     "Apotek Alkes Galaksi", "Apotek Alkes Kahayan Farma", "Apotek Alkes Karet",
     "Apotek Alkes Rajawali", "Apotek Alkes Sethadji", "Apotek Alkes Sisingamangaraja",
