@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import requests
-import matplotlib.pyplot as plt
 
 # --- CONFIG
 st.set_page_config(page_title="Sistem Rekomendasi Apotek", layout="centered")
