@@ -4,19 +4,18 @@ import numpy as np
 import requests
 
 # --- Judul ---
-st.title("Multi Criteria Decision Making (MCDM) Pemilihan Apotek Kota Palangka Raya")
+st.title("Multi Criteria Decision Making (MCDM)")
 st.write("Aplikasi ini menggunakan metode TOPSIS untuk memilih apotek berdasarkan sentimen dan jarak.")
 
 # --- API Key dan Mode ---
 api_key = "AIzaSyBqMqXOO-8ZrsSPMQXMeUVYmG-zDHnKeL0"  # Ganti dengan key-mu
 
 # --- Input Lokasi Pengguna ---
-with st.sidebar:
-    st.header("📌 Input Lokasi & Preferensi")
-    alamat = st.text_input("Masukkan Alamat Anda:", placeholder="Contoh: Universitas Palangka Raya")
-    mode = st.selectbox("Pilih Moda Transportasi:", ["driving", "walking", "two_wheeler"])
-    cari = st.button("📍 Proses Rekomendasi")
+alamat = st.text_input("Masukkan alamat asal:")
 
+mode = st.selectbox("Pilih moda transportasi", ["driving", "walking", "bicycling"])
+
+cari = st.button("Cari dan Hitung Rekomendasi")
 
 if cari and alamat:
     st.write(f"Mencari lokasi: {alamat}")
