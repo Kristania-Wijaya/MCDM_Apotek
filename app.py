@@ -7,7 +7,7 @@ import requests
 st.set_page_config(page_title="Sistem Rekomendasi Apotek", layout="centered")
 
 # --- JUDUL UTAMA
-st.title("🏥 Multi Criteria Decision Making (MCDM)")
+st.title("🏥 Multi Criteria Decision Making (MCDM) Pemilihan Apotek Kota Palangka Raya")
 st.markdown("Aplikasi ini menggunakan metode TOPSIS untuk memilih apotek berdasarkan sentimen dan jarak")
 
 # --- SIDEBAR INPUT
