@@ -9,10 +9,13 @@ st.write("Aplikasi ini menggunakan metode TOPSIS untuk memilih apotek berdasarka
 
 # --- API Key dan Mode ---
 api_key = "AIzaSyBqMqXOO-8ZrsSPMQXMeUVYmG-zDHnKeL0"  # Ganti dengan key-mu
-mode = st.selectbox("Pilih moda transportasi", ["driving", "walking", "bicycling", "transit"])
 
 # --- Input Lokasi Pengguna ---
+st.write("Tuliskan Lokasi Anda")
 alamat = st.text_input("Masukkan alamat asal:")
+
+mode = st.selectbox("Pilih moda transportasi", ["driving", "walking", "bicycling"])
+
 cari = st.button("Cari dan Hitung Rekomendasi")
 
 if cari and alamat:
