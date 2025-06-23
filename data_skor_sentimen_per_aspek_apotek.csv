@@ -1,0 +1,31 @@
+apotek,Dominant_Aspect,positive,negative,total_ulasan,skor_sentimen_positif,skor_sentimen_negatif
+Apotek Alkes Barokah,Ketersediaan Obat dan Harga,16.0,1.0,17.0,94.12,5.88
+Apotek Alkes Barokah,Pelayanan dan Fasilitas,70.0,0.0,70.0,100.0,0.0
+Apotek Alkes Galaksi,Ketersediaan Obat dan Harga,7.0,1.0,8.0,87.5,12.5
+Apotek Alkes Galaksi,Pelayanan dan Fasilitas,43.0,1.0,44.0,97.73,2.27
+Apotek Alkes Kahayan Farma,Ketersediaan Obat dan Harga,4.0,0.0,4.0,100.0,0.0
+Apotek Alkes Kahayan Farma,Pelayanan dan Fasilitas,27.0,2.0,29.0,93.1,6.9
+Apotek Alkes Karet,Ketersediaan Obat dan Harga,5.0,0.0,5.0,100.0,0.0
+Apotek Alkes Karet,Pelayanan dan Fasilitas,18.0,4.0,22.0,81.82,18.18
+Apotek Alkes Rajawali,Ketersediaan Obat dan Harga,10.0,1.0,11.0,90.91,9.09
+Apotek Alkes Rajawali,Pelayanan dan Fasilitas,41.0,5.0,46.0,89.13,10.87
+Apotek Alkes Sethadji,Ketersediaan Obat dan Harga,3.0,1.0,4.0,75.0,25.0
+Apotek Alkes Sethadji,Pelayanan dan Fasilitas,22.0,4.0,26.0,84.62,15.38
+Apotek Alkes Sisingamangaraja,Ketersediaan Obat dan Harga,8.0,0.0,8.0,100.0,0.0
+Apotek Alkes Sisingamangaraja,Pelayanan dan Fasilitas,58.0,1.0,59.0,98.31,1.69
+Apotek Daoni,Ketersediaan Obat dan Harga,3.0,0.0,3.0,100.0,0.0
+Apotek Daoni,Pelayanan dan Fasilitas,41.0,9.0,50.0,82.0,18.0
+Apotek K-24 Rajawali Sejahtera,Ketersediaan Obat dan Harga,5.0,0.0,5.0,100.0,0.0
+Apotek K-24 Rajawali Sejahtera,Pelayanan dan Fasilitas,33.0,10.0,43.0,76.74,23.26
+Apotek Kahanjak Medika,Ketersediaan Obat dan Harga,8.0,0.0,8.0,100.0,0.0
+Apotek Kahanjak Medika,Pelayanan dan Fasilitas,139.0,0.0,139.0,100.0,0.0
+Apotek Kimia Farma Diponegoro,Ketersediaan Obat dan Harga,17.0,2.0,19.0,89.47,10.53
+Apotek Kimia Farma Diponegoro,Pelayanan dan Fasilitas,40.0,8.0,48.0,83.33,16.67
+Apotek New Life,Ketersediaan Obat dan Harga,3.0,0.0,3.0,100.0,0.0
+Apotek New Life,Pelayanan dan Fasilitas,36.0,0.0,36.0,100.0,0.0
+Apotek Perintis Alkestama,Ketersediaan Obat dan Harga,19.0,0.0,19.0,100.0,0.0
+Apotek Perintis Alkestama,Pelayanan dan Fasilitas,62.0,7.0,69.0,89.86,10.14
+Apotek Pontianak,Ketersediaan Obat dan Harga,17.0,5.0,22.0,77.27,22.73
+Apotek Pontianak,Pelayanan dan Fasilitas,17.0,1.0,18.0,94.44,5.56
+Apotek Segar,Ketersediaan Obat dan Harga,73.0,4.0,77.0,94.81,5.19
+Apotek Segar,Pelayanan dan Fasilitas,47.0,23.0,70.0,67.14,32.86
