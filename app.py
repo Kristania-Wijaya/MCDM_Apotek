@@ -6,7 +6,7 @@ import requests
 # === Konfigurasi Aplikasi ===
 st.set_page_config(page_title="Rekomendasi Apotek", layout="wide")
 st.title("🏥 Sistem Pendukung Keputusan Pemilihan Apotek")
-st.write("Metode yang digunakan: **TOPSIS** berbasis **sentimen aspek dan jarak dari Google Maps** dengan normalisasi vektor.")
+st.write("Metode yang digunakan: TOPSIS berbasis sentimen aspek dan jarak dari Google Maps API.")
 
 # === API Key Google Maps ===
 api_key = "AIzaSyBqMqXOO-8ZrsSPMQXMeUVYmG-zDHnKeL0"  # Ganti dengan milikmu
