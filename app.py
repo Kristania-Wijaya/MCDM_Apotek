@@ -5,7 +5,7 @@ import requests
 
 # === Konfigurasi Aplikasi ===
 st.set_page_config(page_title="Rekomendasi Apotek", layout="wide")
-st.title("🏥 Sistem Pendukung Keputusan Pemilihan Apotek")
+st.title("🏥 MULTI CRITERIA DECISION MAKING (MCDM) PEMILIHAN APOTEK KOTA PALANGKA RAYA")
 st.write("Metode: **TOPSIS** berbasis **sentimen aspek** dan **jarak Google Maps**")
 
 # === API Key Google Maps ===
