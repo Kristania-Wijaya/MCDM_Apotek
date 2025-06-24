@@ -13,7 +13,7 @@ api_key = "AIzaSyBqMqXOO-8ZrsSPMQXMeUVYmG-zDHnKeL0"  # Ganti dengan key-mu
 # --- Input Lokasi Pengguna ---
 alamat = st.text_input("📍Masukkan alamat:")
 
-mode = st.selectbox("Pilih moda transportasi", ["driving", "walking", "bicycling"])
+mode = st.selectbox("Pilih moda transportasi", ["driving", "two-wheeler", "walking"])
 
 cari = st.button("Cari dan Hitung Rekomendasi")
 
