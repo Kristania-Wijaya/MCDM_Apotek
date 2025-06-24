@@ -77,16 +77,23 @@ if submit and alamat:
             if df_all.empty:
                 st.warning("Tidak ada data apotek yang memiliki data lengkap untuk TOPSIS.")
             else:
-                # --- Perhitungan TOPSIS ---
+                # --- Perhitungan TOPSIS dengan Normalisasi Min-Max ---
                 X = df_all[["Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga", "distance_meters"]].to_numpy().astype(float)
-                norm = np.linalg.norm(X, axis=0)
-                X_norm = X / norm
+                
+                # Min-Max Normalisasi
+                X_min = X.min(axis=0)
+                X_max = X.max(axis=0)
+                X_norm = (X - X_min) / (X_max - X_min)
+
+                # Bobot kriteria
                 weights = np.array([0.45, 0.25, 0.30])
                 X_weighted = X_norm * weights
 
+                # Solusi ideal positif & negatif
                 ideal_pos = [np.max(X_weighted[:, 0]), np.max(X_weighted[:, 1]), np.min(X_weighted[:, 2])]
                 ideal_neg = [np.min(X_weighted[:, 0]), np.min(X_weighted[:, 1]), np.max(X_weighted[:, 2])]
 
+                # Jarak ke solusi ideal
                 D_pos = np.linalg.norm(X_weighted - ideal_pos, axis=1)
                 D_neg = np.linalg.norm(X_weighted - ideal_neg, axis=1)
 
@@ -104,4 +111,5 @@ if submit and alamat:
 
         else:
             st.error(f"Lokasi tidak ditemukan: {geo_res['status']}")
+
 
