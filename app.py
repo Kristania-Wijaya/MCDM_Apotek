@@ -37,8 +37,8 @@ if bobot_mode == "Gunakan default":
     - Jarak: {bobot_jarak}%
     """)
 else:
-    bobot_pelayanan = st.sidebar.slider("Pelayanan (%)", 0, 100, 33)
-    bobot_harga = st.sidebar.slider("Harga (%)", 0, 100, 33)
+    bobot_pelayanan = st.sidebar.slider("Pelayanan dan Fasilitas (%)", 0, 100, 33)
+    bobot_harga = st.sidebar.slider("Ketersediaan Obat dan Harga (%)", 0, 100, 33)
     bobot_jarak = st.sidebar.slider("Jarak (%)", 0, 100, 34)
     total_bobot = bobot_pelayanan + bobot_harga + bobot_jarak
 
