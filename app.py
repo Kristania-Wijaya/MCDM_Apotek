@@ -32,8 +32,8 @@ if bobot_mode == "Gunakan default":
     valid_bobot = True
     st.sidebar.markdown(f"""
     **Bobot default:**
-    - Pelayanan: {bobot_pelayanan}%
-    - Harga: {bobot_harga}%
+    - Pelayanan dan Fasilitas: {bobot_pelayanan}%
+    - Ketersediaan Obat dan Harga: {bobot_harga}%
     - Jarak: {bobot_jarak}%
     """)
 else:
