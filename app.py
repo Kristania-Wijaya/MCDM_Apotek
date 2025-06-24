@@ -9,7 +9,7 @@ st.title("🏥 Sistem Pendukung Keputusan Pemilihan Apotek")
 st.write("Metode yang digunakan: **TOPSIS** berbasis **sentimen aspek dan jarak dari Google Maps**.")
 
 # === API Key Google Maps ===
-api_key = "AIzaSyBqMqXOO-8ZrsSPMQXMeUVYmG-zDHnKeL0"  # Ganti dengan API key milikmu
+api_key = "AIzaSyBqMqXOO-8ZrsSPMQXMeUVYmG-zDHnKeL0"  # Ganti dengan milikmu
 
 # === Data Apotek ===
 apotek_list = [
@@ -20,29 +20,38 @@ apotek_list = [
     "Apotek Pontianak Palangka Raya", "Apotek Segar"
 ]
 
-# === Sidebar: Input Bobot Kriteria User ===
-st.sidebar.title("⚖️ Tentukan Bobot Kriteria")
-st.sidebar.write("Silakan atur bobot masing-masing kriteria. Total bobot harus 100%.")
+# === Sidebar: Pilihan Bobot ===
+st.sidebar.title("⚖️ Pengaturan Bobot Kriteria")
 
-col1, col2, col3 = st.sidebar.columns(3)
-with col1:
-    bobot_pelayanan = st.number_input("Pelayanan (%)", min_value=0, max_value=100, value=33, step=1, key="pelayanan")
-with col2:
-    bobot_harga = st.number_input("Harga (%)", min_value=0, max_value=100, value=33, step=1, key="harga")
-with col3:
-    bobot_jarak = st.number_input("Jarak (%)", min_value=0, max_value=100, value=34, step=1, key="jarak")
+bobot_mode = st.sidebar.radio("Pilih metode bobot kriteria:", ["Gunakan default", "Tentukan sendiri"])
 
-total_bobot = bobot_pelayanan + bobot_harga + bobot_jarak
-
-if total_bobot != 100:
-    st.sidebar.error(f"Total bobot: {total_bobot}%. Harus tepat 100%!")
-    submit = False
+if bobot_mode == "Gunakan default":
+    bobot_pelayanan = 45
+    bobot_harga = 25
+    bobot_jarak = 30
+    st.sidebar.markdown(f"""
+    **Bobot default digunakan:**
+    - Pelayanan: {bobot_pelayanan}%
+    - Harga: {bobot_harga}%
+    - Jarak: {bobot_jarak}%
+    """)
 else:
-    submit = st.button("🔍 Cari dan Hitung Rekomendasi")
+    col1, col2, col3 = st.sidebar.columns(3)
+    with col1:
+        bobot_pelayanan = st.slider("Pelayanan (%)", 0, 100, 45, key="pelayanan")
+    with col2:
+        max_harga = 100 - bobot_pelayanan
+        bobot_harga = st.slider("Harga (%)", 0, max_harga, 25, key="harga")
+    with col3:
+        bobot_jarak = 100 - bobot_pelayanan - bobot_harga
+        st.markdown(f"**Jarak:** {bobot_jarak}%")
+    if bobot_jarak < 0:
+        st.sidebar.error("Total bobot tidak boleh melebihi 100%.")
 
-# === Input Lokasi ===
+# === Input Lokasi dan Mode ===
 alamat = st.text_input("📍 Masukkan alamat Anda:", placeholder="Contoh: Universitas Palangka Raya")
 mode = st.selectbox("Pilih moda transportasi", ["driving", "two-wheeler", "walking"])
+submit = st.button("🔍 Cari dan Hitung Rekomendasi")
 
 # === Fungsi hitung jarak ===
 def get_distance_duration(origin_latlon, destination, mode="driving", api_key=""):
@@ -66,7 +75,7 @@ def get_distance_duration(origin_latlon, destination, mode="driving", api_key=""
         "distance_meters": element["distance"]["value"]
     }
 
-# === Eksekusi Perhitungan ===
+# === Eksekusi Jika Submit ===
 if submit and alamat:
     with st.spinner("🔎 Mendeteksi lokasi..."):
         geocode_url = "https://maps.googleapis.com/maps/api/geocode/json"
@@ -104,7 +113,7 @@ if submit and alamat:
                 X_max = X.max(axis=0)
                 X_norm = (X - X_min) / (X_max - X_min)
 
-                # Bobot dari input user
+                # Bobot (dari default atau slider)
                 weights = np.array([
                     bobot_pelayanan / 100,
                     bobot_harga / 100,
@@ -129,10 +138,8 @@ if submit and alamat:
                 df_all["rank"] = df_all["topsis_score"].rank(ascending=False).astype(int)
 
                 # === Tampilkan hasil ===
-                st.markdown(f"""
-                ### 📊 Rekomendasi Apotek Terbaik  
-                **Bobot digunakan → Pelayanan: {bobot_pelayanan}%, Harga: {bobot_harga}%, Jarak: {bobot_jarak}%**
-                """)
+                st.subheader("📊 Rekomendasi Apotek Terbaik")
+                st.caption(f"Bobot digunakan → Pelayanan: {bobot_pelayanan}%, Harga: {bobot_harga}%, Jarak: {bobot_jarak}%")
 
                 st.dataframe(df_all.sort_values("topsis_score", ascending=False)[[
                     "rank", "destination", "Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga",
