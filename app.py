@@ -20,22 +20,27 @@ apotek_list = [
     "Apotek Pontianak Palangka Raya", "Apotek Segar"
 ]
 
-# === Sidebar: Pilihan Bobot ===
-st.sidebar.title("⚖️ Pengaturan Bobot Kriteria")
+# === Sidebar: Pilihan Kepentingan Pengguna ===
+st.sidebar.title("⚖️ Pilih Kepentingan Anda")
 
-bobot_mode = st.sidebar.radio("Pilih metode bobot kriteria:", ["Gunakan default", "Tentukan sendiri"])
+preset = st.sidebar.selectbox("Pilih prioritas rekomendasi:", [
+    "⚖️ Seimbang",
+    "🎯 Prioritaskan Pelayanan",
+    "💸 Prioritaskan Harga",
+    "🧭 Prioritaskan Jarak",
+    "🛠️ Tentukan Sendiri"
+])
 
-if bobot_mode == "Gunakan default":
-    bobot_pelayanan = 45
-    bobot_harga = 25
-    bobot_jarak = 30
-    st.sidebar.markdown(f"""
-    **Bobot default digunakan:**
-    - Pelayanan: {bobot_pelayanan}%
-    - Harga: {bobot_harga}%
-    - Jarak: {bobot_jarak}%
-    """)
-else:
+# Atur bobot berdasarkan preset
+if preset == "⚖️ Seimbang":
+    bobot_pelayanan, bobot_harga, bobot_jarak = 33, 33, 34
+elif preset == "🎯 Prioritaskan Pelayanan":
+    bobot_pelayanan, bobot_harga, bobot_jarak = 60, 20, 20
+elif preset == "💸 Prioritaskan Harga":
+    bobot_pelayanan, bobot_harga, bobot_jarak = 20, 60, 20
+elif preset == "🧭 Prioritaskan Jarak":
+    bobot_pelayanan, bobot_harga, bobot_jarak = 20, 20, 60
+elif preset == "🛠️ Tentukan Sendiri":
     col1, col2, col3 = st.sidebar.columns(3)
     with col1:
         bobot_pelayanan = st.slider("Pelayanan (%)", 0, 100, 45, key="pelayanan")
@@ -113,7 +118,7 @@ if submit and alamat:
                 X_max = X.max(axis=0)
                 X_norm = (X - X_min) / (X_max - X_min)
 
-                # Bobot (dari default atau slider)
+                # Bobot
                 weights = np.array([
                     bobot_pelayanan / 100,
                     bobot_harga / 100,
@@ -138,8 +143,10 @@ if submit and alamat:
                 df_all["rank"] = df_all["topsis_score"].rank(ascending=False).astype(int)
 
                 # === Tampilkan hasil ===
-                st.subheader("📊 Rekomendasi Apotek Terbaik")
-                st.caption(f"Bobot digunakan → Pelayanan: {bobot_pelayanan}%, Harga: {bobot_harga}%, Jarak: {bobot_jarak}%")
+                st.markdown(f"""
+                ### 📊 Rekomendasi Apotek Terbaik  
+                **Bobot digunakan → Pelayanan: {bobot_pelayanan}%, Harga: {bobot_harga}%, Jarak: {bobot_jarak}%**
+                """)
 
                 st.dataframe(df_all.sort_values("topsis_score", ascending=False)[[
                     "rank", "destination", "Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga",
