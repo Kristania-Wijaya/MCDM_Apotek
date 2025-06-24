@@ -9,7 +9,7 @@ st.title("🏥 Sistem Pendukung Keputusan Pemilihan Apotek")
 st.write("Metode yang digunakan: **TOPSIS** berbasis **sentimen aspek dan jarak dari Google Maps**.")
 
 # === API Key Google Maps ===
-api_key = "AIzaSyBqMqXOO-8ZrsSPMQXMeUVYmG-zDHnKeL0"  # Ganti dengan milikmu
+api_key = "AIzaSyBqMqXOO-8ZrsSPMQXMeUVYmG-zDHnKeL0"  # Ganti dengan API key milikmu
 
 # === Data Apotek ===
 apotek_list = [
@@ -20,43 +20,29 @@ apotek_list = [
     "Apotek Pontianak Palangka Raya", "Apotek Segar"
 ]
 
-# === Sidebar: Pilihan Kepentingan Pengguna ===
-st.sidebar.title("⚖️ Pilih Kepentingan Anda")
+# === Sidebar: Input Bobot Kriteria User ===
+st.sidebar.title("⚖️ Tentukan Bobot Kriteria")
+st.sidebar.write("Silakan atur bobot masing-masing kriteria. Total bobot harus 100%.")
 
-preset = st.sidebar.selectbox("Pilih prioritas rekomendasi:", [
-    "⚖️ Seimbang",
-    "🎯 Prioritaskan Pelayanan",
-    "💸 Prioritaskan Harga",
-    "🧭 Prioritaskan Jarak",
-    "🛠️ Tentukan Sendiri"
-])
+col1, col2, col3 = st.sidebar.columns(3)
+with col1:
+    bobot_pelayanan = st.number_input("Pelayanan (%)", min_value=0, max_value=100, value=33, step=1, key="pelayanan")
+with col2:
+    bobot_harga = st.number_input("Harga (%)", min_value=0, max_value=100, value=33, step=1, key="harga")
+with col3:
+    bobot_jarak = st.number_input("Jarak (%)", min_value=0, max_value=100, value=34, step=1, key="jarak")
 
-# Atur bobot berdasarkan preset
-if preset == "⚖️ Seimbang":
-    bobot_pelayanan, bobot_harga, bobot_jarak = 33, 33, 34
-elif preset == "🎯 Prioritaskan Pelayanan":
-    bobot_pelayanan, bobot_harga, bobot_jarak = 60, 20, 20
-elif preset == "💸 Prioritaskan Harga":
-    bobot_pelayanan, bobot_harga, bobot_jarak = 20, 60, 20
-elif preset == "🧭 Prioritaskan Jarak":
-    bobot_pelayanan, bobot_harga, bobot_jarak = 20, 20, 60
-elif preset == "🛠️ Tentukan Sendiri":
-    col1, col2, col3 = st.sidebar.columns(3)
-    with col1:
-        bobot_pelayanan = st.slider("Pelayanan (%)", 0, 100, 45, key="pelayanan")
-    with col2:
-        max_harga = 100 - bobot_pelayanan
-        bobot_harga = st.slider("Harga (%)", 0, max_harga, 25, key="harga")
-    with col3:
-        bobot_jarak = 100 - bobot_pelayanan - bobot_harga
-        st.markdown(f"**Jarak:** {bobot_jarak}%")
-    if bobot_jarak < 0:
-        st.sidebar.error("Total bobot tidak boleh melebihi 100%.")
+total_bobot = bobot_pelayanan + bobot_harga + bobot_jarak
 
-# === Input Lokasi dan Mode ===
+if total_bobot != 100:
+    st.sidebar.error(f"Total bobot: {total_bobot}%. Harus tepat 100%!")
+    submit = False
+else:
+    submit = st.button("🔍 Cari dan Hitung Rekomendasi")
+
+# === Input Lokasi ===
 alamat = st.text_input("📍 Masukkan alamat Anda:", placeholder="Contoh: Universitas Palangka Raya")
 mode = st.selectbox("Pilih moda transportasi", ["driving", "two-wheeler", "walking"])
-submit = st.button("🔍 Cari dan Hitung Rekomendasi")
 
 # === Fungsi hitung jarak ===
 def get_distance_duration(origin_latlon, destination, mode="driving", api_key=""):
@@ -80,7 +66,7 @@ def get_distance_duration(origin_latlon, destination, mode="driving", api_key=""
         "distance_meters": element["distance"]["value"]
     }
 
-# === Eksekusi Jika Submit ===
+# === Eksekusi Perhitungan ===
 if submit and alamat:
     with st.spinner("🔎 Mendeteksi lokasi..."):
         geocode_url = "https://maps.googleapis.com/maps/api/geocode/json"
@@ -118,7 +104,7 @@ if submit and alamat:
                 X_max = X.max(axis=0)
                 X_norm = (X - X_min) / (X_max - X_min)
 
-                # Bobot
+                # Bobot dari input user
                 weights = np.array([
                     bobot_pelayanan / 100,
                     bobot_harga / 100,
