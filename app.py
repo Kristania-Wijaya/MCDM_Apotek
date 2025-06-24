@@ -47,6 +47,14 @@ def get_distance_duration(origin_latlon, destination, mode="driving", api_key=""
         "distance_meters": element["distance"]["value"]
     }
 
+# === Sidebar Slider Bobot Kriteria ===
+st.sidebar.title("⚖️ Pengaturan Bobot Kriteria")
+bobot_pelayanan = st.sidebar.slider("Bobot Pelayanan dan Fasilitas (%)", 0, 100, 45)
+bobot_harga = st.sidebar.slider("Bobot Ketersediaan Obat dan Harga (%)", 0, 100 - bobot_pelayanan, 25)
+bobot_jarak = 100 - bobot_pelayanan - bobot_harga
+
+st.sidebar.markdown(f"Bobot Jarak: **{bobot_jarak}%**")
+
 # === Jika tombol diklik ===
 if submit and alamat:
     with st.spinner("Mengambil lokasi dari Google Maps..."):
@@ -86,7 +94,11 @@ if submit and alamat:
                 X_norm = (X - X_min) / (X_max - X_min)
 
                 # Bobot kriteria
-                weights = np.array([0.45, 0.25, 0.30])
+                weights = np.array([
+                bobot_pelayanan / 100,
+                bobot_harga / 100,
+                bobot_jarak / 100
+            ])
                 X_weighted = X_norm * weights
 
                 # Solusi ideal positif & negatif
