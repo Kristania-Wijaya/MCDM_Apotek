@@ -20,6 +20,24 @@ apotek_list = [
     "Apotek Pontianak Palangka Raya", "Apotek Segar"
 ]
 
+# === Sidebar: Pengaturan Bobot Kriteria ===
+st.sidebar.title("⚖️ Pengaturan Bobot Kriteria")
+col1, col2, col3 = st.sidebar.columns(3)
+
+with col1:
+    bobot_pelayanan = st.slider("Pelayanan (%)", 0, 100, 45, key="pelayanan")
+
+with col2:
+    max_harga = 100 - bobot_pelayanan
+    bobot_harga = st.slider("Harga (%)", 0, max_harga, 25, key="harga")
+
+with col3:
+    bobot_jarak = 100 - bobot_pelayanan - bobot_harga
+    st.markdown(f"**Jarak:** {bobot_jarak}%")
+
+if bobot_jarak < 0:
+    st.sidebar.error("Total bobot tidak boleh melebihi 100%. Kurangi salah satu nilai.")
+
 # === Input Alamat & Mode Transportasi ===
 alamat = st.text_input("📍 Masukkan alamat Anda:", placeholder="Contoh: Universitas Palangka Raya")
 mode = st.selectbox("Pilih moda transportasi", ["driving", "two-wheeler", "walking"])
@@ -46,14 +64,6 @@ def get_distance_duration(origin_latlon, destination, mode="driving", api_key=""
         "distance_text": element["distance"]["text"],
         "distance_meters": element["distance"]["value"]
     }
-
-# === Sidebar Slider Bobot Kriteria ===
-st.sidebar.title("⚖️ Pengaturan Bobot Kriteria")
-bobot_pelayanan = st.sidebar.slider("Bobot Pelayanan dan Fasilitas (%)", 0, 100, 45)
-bobot_harga = st.sidebar.slider("Bobot Ketersediaan Obat dan Harga (%)", 0, 100 - bobot_pelayanan, 25)
-bobot_jarak = 100 - bobot_pelayanan - bobot_harga
-
-st.sidebar.markdown(f"Bobot Jarak: **{bobot_jarak}%**")
 
 # === Jika tombol diklik ===
 if submit and alamat:
@@ -93,12 +103,14 @@ if submit and alamat:
                 X_max = X.max(axis=0)
                 X_norm = (X - X_min) / (X_max - X_min)
 
-                # Bobot kriteria
+                # Bobot dari slider
                 weights = np.array([
-                bobot_pelayanan / 100,
-                bobot_harga / 100,
-                bobot_jarak / 100
-            ])
+                    bobot_pelayanan / 100,
+                    bobot_harga / 100,
+                    bobot_jarak / 100
+                ])
+
+                # Bobotkan matriks
                 X_weighted = X_norm * weights
 
                 # Solusi ideal positif & negatif
@@ -109,6 +121,7 @@ if submit and alamat:
                 D_pos = np.linalg.norm(X_weighted - ideal_pos, axis=1)
                 D_neg = np.linalg.norm(X_weighted - ideal_neg, axis=1)
 
+                # Preferensi
                 preference = D_neg / (D_pos + D_neg)
 
                 df_all["topsis_score"] = preference
@@ -116,6 +129,7 @@ if submit and alamat:
 
                 # --- Tampilkan hasil ---
                 st.subheader("📊 Rekomendasi Apotek Terbaik")
+                st.caption(f"Bobot digunakan: Pelayanan {bobot_pelayanan}%, Harga {bobot_harga}%, Jarak {bobot_jarak}%")
                 st.dataframe(df_all.sort_values("topsis_score", ascending=False)[[
                     "rank", "destination", "Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga",
                     "distance_text", "topsis_score"
@@ -123,5 +137,3 @@ if submit and alamat:
 
         else:
             st.error(f"Lokasi tidak ditemukan: {geo_res['status']}")
-
-
