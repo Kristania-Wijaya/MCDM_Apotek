@@ -29,6 +29,8 @@ if bobot_mode == "Gunakan default":
     bobot_pelayanan = 45
     bobot_harga = 25
     bobot_jarak = 30
+    total_bobot = 100
+    valid_bobot = True
     st.sidebar.markdown(f"""
     **Bobot default digunakan:**
     - Pelayanan: {bobot_pelayanan}%
@@ -36,22 +38,25 @@ if bobot_mode == "Gunakan default":
     - Jarak: {bobot_jarak}%
     """)
 else:
-    col1, col2, col3 = st.sidebar.columns(3)
-    with col1:
-        bobot_pelayanan = st.slider("Pelayanan (%)", 0, 100, 45, key="pelayanan")
-    with col2:
-        max_harga = 100 - bobot_pelayanan
-        bobot_harga = st.slider("Harga (%)", 0, max_harga, 25, key="harga")
-    with col3:
-        bobot_jarak = 100 - bobot_pelayanan - bobot_harga
-        st.markdown(f"**Jarak:** {bobot_jarak}%")
-    if bobot_jarak < 0:
-        st.sidebar.error("Total bobot tidak boleh melebihi 100%.")
+    st.sidebar.markdown("**Tentukan bobot sendiri (total harus 100%)**")
+    bobot_pelayanan = st.sidebar.number_input("Pelayanan (%)", 0, 100, step=1, value=33)
+    bobot_harga = st.sidebar.number_input("Harga (%)", 0, 100, step=1, value=33)
+    bobot_jarak = st.sidebar.number_input("Jarak (%)", 0, 100, step=1, value=34)
+    total_bobot = bobot_pelayanan + bobot_harga + bobot_jarak
+
+    if total_bobot != 100:
+        st.sidebar.error(f"❌ Total bobot: {total_bobot}%. Harus tepat 100%.")
+        valid_bobot = False
+    else:
+        st.sidebar.success("✅ Total bobot valid: 100%")
+        valid_bobot = True
 
 # === Input Lokasi dan Mode ===
 alamat = st.text_input("📍 Masukkan alamat Anda:", placeholder="Contoh: Universitas Palangka Raya")
 mode = st.selectbox("Pilih moda transportasi", ["driving", "two-wheeler", "walking"])
-submit = st.button("🔍 Cari dan Hitung Rekomendasi")
+
+# Tombol submit hanya muncul jika bobot valid
+submit = st.button("🔍 Cari dan Hitung Rekomendasi") if valid_bobot else None
 
 # === Fungsi hitung jarak ===
 def get_distance_duration(origin_latlon, destination, mode="driving", api_key=""):
@@ -113,7 +118,7 @@ if submit and alamat:
                 X_max = X.max(axis=0)
                 X_norm = (X - X_min) / (X_max - X_min)
 
-                # Bobot (dari default atau slider)
+                # Bobot (dari default atau custom)
                 weights = np.array([
                     bobot_pelayanan / 100,
                     bobot_harga / 100,
@@ -130,7 +135,6 @@ if submit and alamat:
                 # Jarak ke solusi
                 D_pos = np.linalg.norm(X_weighted - ideal_pos, axis=1)
                 D_neg = np.linalg.norm(X_weighted - ideal_neg, axis=1)
-
                 preference = D_neg / (D_pos + D_neg)
 
                 # Tambahkan hasil ke DataFrame
