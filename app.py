@@ -5,7 +5,7 @@ import requests
 
 # === Konfigurasi Aplikasi ===
 st.set_page_config(page_title="Rekomendasi Apotek", layout="wide")
-st.title("🏥 Sistem Pendukung Keputusan Pemilihan Apotek")
+st.title("🏥 Multi Criteria Decission Making (MCDM) Pemilihan Apotek Kota Palangka Raya")
 st.write("Metode yang digunakan: TOPSIS berbasis sentimen aspek dan jarak dari Google Maps API.")
 
 # === API Key Google Maps ===
@@ -95,38 +95,49 @@ if submit and alamat:
 
             # Load Sentimen
             df_sentimen = pd.read_csv("data_skor_sentimen_per_aspek_apotek.csv")
+
+            # Hitung skor total ulasan per apotek
+            df_sentimen["total_ulasan"] = df_sentimen["jumlah_positif"] + df_sentimen["jumlah_negatif"]
+            df_sentimen["skor_total"] = df_sentimen["jumlah_positif"] / df_sentimen["total_ulasan"]
+
+            # Ambil rata-rata skor total per apotek
+            df_skor_total = df_sentimen.groupby("apotek")["skor_total"].mean().reset_index()
+            df_skor_total = df_skor_total.rename(columns={"apotek": "destination", "skor_total": "Skor Sentimen Keseluruhan"})
+
+            # Pivot skor aspek
             df_pivot = df_sentimen.pivot_table(index='apotek', columns='Dominant_Aspect',
                                                values='skor_sentimen_positif', aggfunc='first').reset_index()
             df_pivot = df_pivot.rename(columns={"apotek": "destination"})
 
-            # Gabung Data
+            # Gabung semua data
             df_all = pd.merge(df_jarak, df_pivot, on="destination", how="left")
+            df_all = pd.merge(df_all, df_skor_total, on="destination", how="left")
             df_all = df_all.dropna(subset=["Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga", "distance_meters"])
 
             if df_all.empty:
                 st.warning("⚠️ Tidak ada apotek dengan data lengkap.")
             else:
-                # === Matriks Keputusan ===
+                # Matriks Keputusan
                 X = df_all[["Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga", "distance_meters"]].to_numpy().astype(float)
 
-                # === Normalisasi vektor ===
+                # Normalisasi
                 X_norm = X / np.sqrt((X**2).sum(axis=0))
 
-                # === Bobot ===
+                # Bobot
                 weights = np.array([
                     bobot_pelayanan / 100,
                     bobot_harga / 100,
                     bobot_jarak / 100
                 ])
 
-                # === Matriks terbobot ===
+                # Matriks Terbobot
                 X_weighted = X_norm * weights
 
-                # === Solusi Ideal + (maks) & - (min) ===
+                # Solusi Ideal
                 ideal_pos = [
-                    np.max(X_weighted[:, 0]),  # Pelayanan (benefit)
-                    np.max(X_weighted[:, 1]),  # Harga (benefit)
-                    np.min(X_weighted[:, 2])   # Jarak (cost)
+                    np.max(X_weighted[:, 0]),
+                    np.max(X_weighted[:, 1]),
+                    np.min(X_weighted[:, 2])
                 ]
                 ideal_neg = [
                     np.min(X_weighted[:, 0]),
@@ -134,22 +145,22 @@ if submit and alamat:
                     np.max(X_weighted[:, 2])
                 ]
 
-                # === Jarak ke solusi ideal ===
+                # Jarak ke solusi ideal
                 D_pos = np.linalg.norm(X_weighted - ideal_pos, axis=1)
                 D_neg = np.linalg.norm(X_weighted - ideal_neg, axis=1)
                 preference = D_neg / (D_pos + D_neg)
 
-                # Tambah skor ke DataFrame
+                # Tambah skor dan ranking
                 df_all["topsis_score"] = preference
                 df_all["rank"] = df_all["topsis_score"].rank(ascending=False).astype(int)
 
-                # === Tampilkan hasil ===
+                # Tampilkan hasil
                 st.subheader("📊 Rekomendasi Apotek Terbaik")
                 st.caption(f"Bobot digunakan → Pelayanan: {bobot_pelayanan}%, Harga: {bobot_harga}%, Jarak: {bobot_jarak}%")
 
                 st.dataframe(df_all.sort_values("topsis_score", ascending=False)[[
-                    "rank", "destination", "Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga",
-                    "distance_text", "topsis_score"
+                    "Rank", "Destination", "Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga",
+                    "Jarak", "Skor Sentimen", "Nilai Topsis"
                 ]].reset_index(drop=True), use_container_width=True)
 
         else:
