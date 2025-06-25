@@ -96,9 +96,8 @@ if submit and alamat:
             # Load Sentimen
             df_sentimen = pd.read_csv("data_skor_sentimen_per_aspek_apotek.csv")
 
-            # Hitung skor total ulasan per apotek
-            df_sentimen["total_ulasan"] = df_sentimen["jumlah_positif"] + df_sentimen["jumlah_negatif"]
-            df_sentimen["skor_total"] = df_sentimen["jumlah_positif"] / df_sentimen["total_ulasan"]
+            # Hitung skor total per apotek (menggunakan kolom yang sesuai)
+            df_sentimen["skor_total"] = df_sentimen["positive"] / df_sentimen["total_ulasan"]
 
             # Ambil rata-rata skor total per apotek
             df_skor_total = df_sentimen.groupby("apotek")["skor_total"].mean().reset_index()
@@ -154,23 +153,22 @@ if submit and alamat:
                 df_all["topsis_score"] = preference
                 df_all["rank"] = df_all["topsis_score"].rank(ascending=False).astype(int)
 
-                # Ubah nama kolom untuk tampilan akhir
-                df_display = df_all.rename(columns={
+                # Tampilkan hasil dengan kolom rename
+                st.subheader("📊 Rekomendasi Apotek Terbaik")
+                st.caption(f"Bobot digunakan → Pelayanan: {bobot_pelayanan}%, Harga: {bobot_harga}%, Jarak: {bobot_jarak}%")
+
+                df_tampil = df_all.sort_values("topsis_score", ascending=False)[[
+                    "rank", "destination", "Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga",
+                    "distance_text", "Skor Sentimen Keseluruhan", "topsis_score"
+                ]].rename(columns={
                     "rank": "Rank",
                     "destination": "Destination",
                     "distance_text": "Jarak",
                     "Skor Sentimen Keseluruhan": "Skor Sentimen",
                     "topsis_score": "Nilai Topsis"
-                })
+                }).reset_index(drop=True)
 
-                # Tampilkan hasil
-                st.subheader("📊 Rekomendasi Apotek Terbaik")
-                st.caption(f"Bobot digunakan → Pelayanan: {bobot_pelayanan}%, Harga: {bobot_harga}%, Jarak: {bobot_jarak}%")
-
-                st.dataframe(df_display.sort_values("Nilai Topsis", ascending=False)[[
-                    "Rank", "Destination", "Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga",
-                    "Jarak", "Skor Sentimen", "Nilai Topsis"
-                ]].reset_index(drop=True), use_container_width=True)
+                st.dataframe(df_tampil, use_container_width=True)
 
         else:
             st.error(f"❌ Lokasi tidak ditemukan: {geo_res['status']}")
