@@ -154,11 +154,20 @@ if submit and alamat:
                 df_all["topsis_score"] = preference
                 df_all["rank"] = df_all["topsis_score"].rank(ascending=False).astype(int)
 
+                # Ubah nama kolom untuk tampilan akhir
+                df_display = df_all.rename(columns={
+                    "rank": "Rank",
+                    "destination": "Destination",
+                    "distance_text": "Jarak",
+                    "Skor Sentimen Keseluruhan": "Skor Sentimen",
+                    "topsis_score": "Nilai Topsis"
+                })
+
                 # Tampilkan hasil
                 st.subheader("📊 Rekomendasi Apotek Terbaik")
                 st.caption(f"Bobot digunakan → Pelayanan: {bobot_pelayanan}%, Harga: {bobot_harga}%, Jarak: {bobot_jarak}%")
 
-                st.dataframe(df_all.sort_values("topsis_score", ascending=False)[[
+                st.dataframe(df_display.sort_values("Nilai Topsis", ascending=False)[[
                     "Rank", "Destination", "Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga",
                     "Jarak", "Skor Sentimen", "Nilai Topsis"
                 ]].reset_index(drop=True), use_container_width=True)
