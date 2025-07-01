@@ -9,7 +9,7 @@ st.title("🏥 Multi Criteria Decision Making (MCDM) Pemilihan Apotek Kota Palan
 st.write("Metode yang digunakan: TOPSIS berbasis sentimen aspek dan jarak dari Google Maps API.")
 
 # === API Key Google Maps ===
-api_key = "YOUR_API_KEY"  # Ganti dengan milikmu
+api_key = "AIzaSyBqMqXOO-8ZrsSPMQXMeUVYmG-zDHnKeL0"  
 
 # === Data Apotek ===
 apotek_list = [
