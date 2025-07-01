@@ -5,11 +5,11 @@ import requests
 
 # === Konfigurasi Aplikasi ===
 st.set_page_config(page_title="Rekomendasi Apotek", layout="wide")
-st.title("🏥 Multi Criteria Decission Making (MCDM) Pemilihan Apotek Kota Palangka Raya")
+st.title("🏥 Multi Criteria Decision Making (MCDM) Pemilihan Apotek Kota Palangka Raya")
 st.write("Metode yang digunakan: TOPSIS berbasis sentimen aspek dan jarak dari Google Maps API.")
 
 # === API Key Google Maps ===
-api_key = "AIzaSyBqMqXOO-8ZrsSPMQXMeUVYmG-zDHnKeL0"  # Ganti dengan milikmu
+api_key = "YOUR_API_KEY"  # Ganti dengan milikmu
 
 # === Data Apotek ===
 apotek_list = [
@@ -54,7 +54,7 @@ alamat = st.text_input("📍 Masukkan alamat Anda:", placeholder="Contoh: Univer
 mode = st.selectbox("Pilih moda transportasi", ["driving", "two-wheeler", "walking"])
 submit = st.button("🔍 Cari dan Hitung Rekomendasi") if valid_bobot else None
 
-# === Fungsi: Jarak dari Google Maps ===
+# === Fungsi: Hitung jarak Google Maps ===
 def get_distance_duration(origin_latlon, destination, mode="driving", api_key=""):
     endpoint = "https://maps.googleapis.com/maps/api/distancematrix/json"
     params = {
@@ -76,6 +76,23 @@ def get_distance_duration(origin_latlon, destination, mode="driving", api_key=""
         "distance_meters": element["distance"]["value"]
     }
 
+# === Fungsi Insight ===
+def insight_pelayanan(skor):
+    if skor >= 88:
+        return "Pelayanan sangat baik"
+    elif skor >= 76:
+        return "Pelayanan baik"
+    else:
+        return "Pelayanan perlu ditingkatkan"
+
+def insight_ketersediaan(skor):
+    if skor >= 88:
+        return "Obat sangat lengkap"
+    elif skor >= 76:
+        return "Obat cukup lengkap"
+    else:
+        return "Ketersediaan perlu ditingkatkan"
+
 # === Proses Perhitungan TOPSIS ===
 if submit and alamat:
     with st.spinner("🔎 Mendeteksi lokasi..."):
@@ -96,19 +113,17 @@ if submit and alamat:
             # Load Sentimen
             df_sentimen = pd.read_csv("data_skor_sentimen_per_aspek_apotek.csv")
 
-            # Hitung skor total per apotek (menggunakan kolom yang sesuai)
+            # Hitung skor total per apotek (jika diperlukan)
             df_sentimen["skor_total"] = df_sentimen["positive"] / df_sentimen["total_ulasan"]
-
-            # Ambil rata-rata skor total per apotek
             df_skor_total = df_sentimen.groupby("apotek")["skor_total"].mean().reset_index()
             df_skor_total = df_skor_total.rename(columns={"apotek": "destination", "skor_total": "Skor Sentimen Keseluruhan"})
 
-            # Pivot skor aspek
+            # Pivot aspek
             df_pivot = df_sentimen.pivot_table(index='apotek', columns='Dominant_Aspect',
                                                values='skor_sentimen_positif', aggfunc='first').reset_index()
             df_pivot = df_pivot.rename(columns={"apotek": "destination"})
 
-            # Gabung semua data
+            # Gabung semua
             df_all = pd.merge(df_jarak, df_pivot, on="destination", how="left")
             df_all = pd.merge(df_all, df_skor_total, on="destination", how="left")
             df_all = df_all.dropna(subset=["Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga", "distance_meters"])
@@ -116,11 +131,13 @@ if submit and alamat:
             if df_all.empty:
                 st.warning("⚠️ Tidak ada apotek dengan data lengkap.")
             else:
+                # Tambah insight
+                df_all["Insight Pelayanan"] = df_all["Pelayanan dan Fasilitas"].apply(insight_pelayanan)
+                df_all["Insight Ketersediaan"] = df_all["Ketersediaan Obat dan Harga"].apply(insight_ketersediaan)
+
                 # Matriks Keputusan
                 X = df_all[["Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga", "distance_meters"]].to_numpy().astype(float)
-
-                # Normalisasi
-                X_norm = X / np.sqrt((X**2).sum(axis=0))
+                X_norm = X / np.sqrt((X ** 2).sum(axis=0))
 
                 # Bobot
                 weights = np.array([
@@ -149,16 +166,15 @@ if submit and alamat:
                 D_neg = np.linalg.norm(X_weighted - ideal_neg, axis=1)
                 preference = D_neg / (D_pos + D_neg)
 
-                # Tambah skor dan ranking
                 df_all["topsis_score"] = preference
                 df_all["rank"] = df_all["topsis_score"].rank(ascending=False).astype(int)
 
-                # Tampilkan hasil dengan kolom rename
                 st.subheader("📊 Rekomendasi Apotek Terbaik")
-                st.caption(f"Bobot digunakan → Pelayanan: {bobot_pelayanan}%, Harga: {bobot_harga}%, Jarak: {bobot_jarak}%")
+                st.caption(f"Bobot → Pelayanan: {bobot_pelayanan}%, Ketersediaan: {bobot_harga}%, Jarak: {bobot_jarak}%")
 
                 df_tampil = df_all.sort_values("topsis_score", ascending=False)[[
-                    "rank", "destination", "Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga",
+                    "rank", "destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
+                    "Ketersediaan Obat dan Harga", "Insight Ketersediaan",
                     "distance_text", "Skor Sentimen Keseluruhan", "topsis_score"
                 ]].rename(columns={
                     "rank": "Rank",
