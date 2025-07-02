@@ -87,11 +87,11 @@ def insight_pelayanan(skor):
 
 def insight_ketersediaan(skor):
     if skor >= 88:
-        return "Obat sangat lengkap"
+        return "Obat sangat lengkap harga terjangkau"
     elif skor >= 76:
-        return "Obat cukup lengkap"
+        return "Obat cukup lengkap harga cukup terjangkau"
     else:
-        return "Ketersediaan perlu ditingkatkan"
+        return "Ketersediaan atau harga perlu ditingkatkan"
 
 # === Proses Perhitungan TOPSIS ===
 if submit and alamat:
