@@ -25,28 +25,28 @@ st.sidebar.title("⚖️ Pengaturan Bobot Kriteria")
 bobot_mode = st.sidebar.radio("Pilih metode bobot:", ["Gunakan default", "Tentukan sendiri"])
 
 if bobot_mode == "Gunakan default":
-    bobot_pelayanan = 45
-    bobot_harga = 25
-    bobot_jarak = 30
-    total_bobot = 100
+    bobot_pelayanan = 0.45
+    bobot_harga = 0.25
+    bobot_jarak = 0.30
+    total_bobot = 1.0
     valid_bobot = True
     st.sidebar.markdown(f"""
     **Bobot default:**
-    - Pelayanan dan Fasilitas: {bobot_pelayanan}%
-    - Ketersediaan Obat dan Harga: {bobot_harga}%
-    - Jarak: {bobot_jarak}%
+    - Pelayanan dan Fasilitas: {bobot_pelayanan:.2f}
+    - Ketersediaan Obat dan Harga: {bobot_harga:.2f}
+    - Jarak: {bobot_jarak:.2f}
     """)
 else:
-    bobot_pelayanan = st.sidebar.slider("Pelayanan dan Fasilitas (%)", 0, 100, 33)
-    bobot_harga = st.sidebar.slider("Ketersediaan Obat dan Harga (%)", 0, 100, 33)
-    bobot_jarak = st.sidebar.slider("Jarak (%)", 0, 100, 34)
+    bobot_pelayanan = st.sidebar.slider("Pelayanan dan Fasilitas", 0.0, 1.0, 0.45, 0.05)
+    bobot_harga = st.sidebar.slider("Ketersediaan Obat dan Harga", 0.0, 1.0, 0.25, 0.05)
+    bobot_jarak = st.sidebar.slider("Jarak", 0.0, 1.0, 0.30, 0.05)
     total_bobot = bobot_pelayanan + bobot_harga + bobot_jarak
 
-    if total_bobot != 100:
-        st.sidebar.error(f"❌ Total bobot harus 100%, sekarang: {total_bobot}%")
+    if not np.isclose(total_bobot, 1.0):
+        st.sidebar.error(f"❌ Total bobot harus 1.0, sekarang: {total_bobot:.2f}")
         valid_bobot = False
     else:
-        st.sidebar.success("✅ Total bobot valid: 100%")
+        st.sidebar.success(f"✅ Total bobot valid: {total_bobot:.2f}")
         valid_bobot = True
 
 # === Input Lokasi ===
