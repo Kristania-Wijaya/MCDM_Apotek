@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -21,32 +22,32 @@ apotek_list = [
 ]
 
 # === Sidebar: Bobot Kriteria ===
-st.sidebar.title("⚖️ Pengaturan Bobot Kriteria")
+st.sidebar.title(⚖️ Pengaturan Bobot Kriteria")
 bobot_mode = st.sidebar.radio("Pilih metode bobot:", ["Gunakan default", "Tentukan sendiri"])
 
 if bobot_mode == "Gunakan default":
-    bobot_pelayanan = 0.45
-    bobot_harga = 0.25
-    bobot_jarak = 0.30
-    total_bobot = 1.0
+    bobot_pelayanan = 45
+    bobot_harga = 25
+    bobot_jarak = 30
+    total_bobot = 100
     valid_bobot = True
     st.sidebar.markdown(f"""
     **Bobot default:**
-    - Pelayanan dan Fasilitas: {bobot_pelayanan:.2f}
-    - Ketersediaan Obat dan Harga: {bobot_harga:.2f}
-    - Jarak: {bobot_jarak:.2f}
+    - Pelayanan dan Fasilitas: {bobot_pelayanan}%
+    - Ketersediaan Obat dan Harga: {bobot_harga}%
+    - Jarak: {bobot_jarak}%
     """)
 else:
-    bobot_pelayanan = st.sidebar.slider("Pelayanan dan Fasilitas", 0.0, 1.0, 0.45, 0.05)
-    bobot_harga = st.sidebar.slider("Ketersediaan Obat dan Harga", 0.0, 1.0, 0.25, 0.05)
-    bobot_jarak = st.sidebar.slider("Jarak", 0.0, 1.0, 0.30, 0.05)
+    bobot_pelayanan = st.sidebar.slider("Pelayanan dan Fasilitas (%)", 0, 100, 33)
+    bobot_harga = st.sidebar.slider("Ketersediaan Obat dan Harga (%)", 0, 100, 33)
+    bobot_jarak = st.sidebar.slider("Jarak (%)", 0, 100, 34)
     total_bobot = bobot_pelayanan + bobot_harga + bobot_jarak
 
-    if not np.isclose(total_bobot, 1.0):
-        st.sidebar.error(f"❌ Total bobot harus 1.0, sekarang: {total_bobot:.2f}")
+    if total_bobot != 100:
+        st.sidebar.error(f"❌ Total bobot harus 100%, sekarang: {total_bobot}%")
         valid_bobot = False
     else:
-        st.sidebar.success(f"✅ Total bobot valid: {total_bobot:.2f}")
+        st.sidebar.success("✅ Total bobot valid: 100%")
         valid_bobot = True
 
 # === Input Lokasi ===
@@ -140,9 +141,9 @@ if submit and alamat:
                 X_norm = X / np.sqrt((X ** 2).sum(axis=0))
                 # Bobot
                 weights = np.array([
-                    bobot_pelayanan,
-                    bobot_harga,
-                    bobot_jarak
+                    bobot_pelayanan / 100,
+                    bobot_harga / 100,
+                    bobot_jarak / 100
                 ])
 
                 # Matriks Terbobot
@@ -169,7 +170,7 @@ if submit and alamat:
                 df_all["rank"] = df_all["topsis_score"].rank(ascending=False).astype(int)
 
                 st.subheader("📊 Rekomendasi Apotek Terbaik")
-                st.caption(f"Bobot → Pelayanan: {bobot_pelayanan:.2f}, Ketersediaan: {bobot_harga:.2f}, Jarak: {bobot_jarak:.2f}")
+                st.caption(f"Bobot → Pelayanan: {bobot_pelayanan}%, Ketersediaan: {bobot_harga}%, Jarak: {bobot_jarak}%")
 
                 df_tampil = df_all.sort_values("topsis_score", ascending=False)[[
                     "rank", "destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
