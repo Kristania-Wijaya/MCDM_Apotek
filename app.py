@@ -25,9 +25,9 @@ st.sidebar.title("⚖️ Pengaturan Bobot Kriteria")
 bobot_mode = st.sidebar.radio("Pilih metode bobot:", ["Gunakan default", "Tentukan sendiri"])
 
 if bobot_mode == "Gunakan default":
-    bobot_pelayanan = 45
-    bobot_harga = 25
-    bobot_jarak = 30
+    bobot_pelayanan = 0.45
+    bobot_harga = 0.25
+    bobot_jarak = 0.30
     total_bobot = 100
     valid_bobot = True
     st.sidebar.markdown(f"""
@@ -137,8 +137,7 @@ if submit and alamat:
 
                 # Matriks Keputusan
                 X = df_all[["Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga", "distance_meters"]].to_numpy().astype(float)
-                norm = np.linalg.norm(X, axis=0)
-                X_norm = X / norm
+                X_norm = X / np.sqrt((X ** 2).sum(axis=0))
                 # Bobot
                 weights = np.array([
                     bobot_pelayanan / 100,
