@@ -140,9 +140,9 @@ if submit and alamat:
                 X_norm = X / np.sqrt((X ** 2).sum(axis=0))
                 # Bobot
                 weights = np.array([
-                    bobot_pelayanan / 100,
-                    bobot_harga / 100,
-                    bobot_jarak / 100
+                    bobot_pelayanan,
+                    bobot_harga,
+                    bobot_jarak
                 ])
 
                 # Matriks Terbobot
@@ -169,7 +169,7 @@ if submit and alamat:
                 df_all["rank"] = df_all["topsis_score"].rank(ascending=False).astype(int)
 
                 st.subheader("📊 Rekomendasi Apotek Terbaik")
-                st.caption(f"Bobot → Pelayanan: {bobot_pelayanan}%, Ketersediaan: {bobot_harga}%, Jarak: {bobot_jarak}%")
+                st.caption(f"Bobot → Pelayanan: {bobot_pelayanan:.2f}, Ketersediaan: {bobot_harga:.2f}, Jarak: {bobot_jarak:.2f}")
 
                 df_tampil = df_all.sort_values("topsis_score", ascending=False)[[
                     "rank", "destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
