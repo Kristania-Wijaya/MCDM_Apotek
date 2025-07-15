@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -18,7 +17,7 @@ apotek_list = [
     "Apotek Alkes Rajawali", "Apotek Alkes Sethadji", "Apotek Alkes Sisingamangaraja",
     "Apotek Alkes Barokah", "Apotek Daoni", "Apotek K-24 Rajawali Sejahtera", "Apotek Kahanjak Medika",
     "Apotek Kimia Farma Diponegoro Palangka Raya", "Apotek New Life", "Apotek Perintis Alkestama",
-    "Apotek Pontianak Palangka Raya", "Apotek Segar Palangka Raya"
+    "Apotek Pontianak Palangka Raya", "Apotek Segar"
 ]
 
 # === Sidebar: Bobot Kriteria ===
@@ -138,8 +137,7 @@ if submit and alamat:
 
                 # Matriks Keputusan
                 X = df_all[["Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga", "distance_meters"]].to_numpy().astype(float)
-                norm = np.linalg.norm(X, axis=0)
-                X_norm = X / norm
+                X_norm = X / np.sqrt((X ** 2).sum(axis=0))
                 # Bobot
                 weights = np.array([
                     bobot_pelayanan / 100,
