@@ -14,10 +14,10 @@ api_key = "AIzaSyBqMqXOO-8ZrsSPMQXMeUVYmG-zDHnKeL0"
 
 # === Data Apotek ===
 apotek_list = [
-    "Apotek Alkes Galaksi", "Apotek Alkes Kahayan Farma", "Apotek Alkes Karet",
-    "Apotek Alkes Rajawali", "Apotek Alkes Sethadji", "Apotek Alkes Sisingamangaraja",
-    "Apotek Alkes Barokah", "Apotek Daoni", "Apotek K-24 Rajawali Sejahtera", "Apotek Kahanjak Medika",
-    "Apotek Kimia Farma Diponegoro Palangka Raya", "Apotek New Life", "Apotek Perintis Alkestama",
+    "Apotek Alkes Galaksi Palangka Raya", "Apotek Alkes Kahayan Farma Palangka Raya", "Apotek Alkes Karet Palangka Raya",
+    "Apotek Alkes Rajawali Palangka Raya", "Apotek Alkes Sethadji Palangka Raya", "Apotek Alkes Sisingamangaraja Palangka Raya",
+    "Apotek Alkes Barokah Palangka Raya", "Apotek Daoni Palangka Raya", "Apotek K-24 Rajawali Sejahtera Palangka Raya", "Apotek Kahanjak Medika Palangka Raya",
+    "Apotek Kimia Farma Diponegoro Palangka Raya", "Apotek New Life Palangka Raya", "Apotek Perintis Alkestama Palangka Raya",
     "Apotek Pontianak Palangka Raya", "Apotek Segar Palangka Raya"
 ]
 
