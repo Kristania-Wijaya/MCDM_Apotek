@@ -22,7 +22,7 @@ apotek_list = [
 ]
 
 # === Sidebar: Bobot Kriteria ===
-st.sidebar.title(⚖️ Pengaturan Bobot Kriteria")
+st.sidebar.title("⚖️ Pengaturan Bobot Kriteria")
 bobot_mode = st.sidebar.radio("Pilih metode bobot:", ["Gunakan default", "Tentukan sendiri"])
 
 if bobot_mode == "Gunakan default":
