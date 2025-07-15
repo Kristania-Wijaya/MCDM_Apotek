@@ -18,7 +18,7 @@ apotek_list = [
     "Apotek Alkes Rajawali", "Apotek Alkes Sethadji", "Apotek Alkes Sisingamangaraja",
     "Apotek Alkes Barokah", "Apotek Daoni", "Apotek K-24 Rajawali Sejahtera", "Apotek Kahanjak Medika",
     "Apotek Kimia Farma Diponegoro Palangka Raya", "Apotek New Life", "Apotek Perintis Alkestama",
-    "Apotek Pontianak Palangka Raya", "Apotek Segar"
+    "Apotek Pontianak Palangka Raya", "Apotek Segar Palangka Raya"
 ]
 
 # === Sidebar: Bobot Kriteria ===
