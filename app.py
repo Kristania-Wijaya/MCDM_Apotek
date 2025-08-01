@@ -186,21 +186,20 @@ if submit and alamat:
 
                 st.dataframe(df_tampil, use_container_width=True)
 
-                        # Tambahan ringkasan insight: Apotek dengan pelayanan sangat baik dan obat sangat lengkap
+                       # Tambahan ringkasan insight: Apotek dengan pelayanan sangat baik dan obat sangat lengkap
                 st.markdown("### 🔎 Apotek dengan Pelayanan Sangat Baik & Obat Sangat Lengkap Harga Terjangkau")
 
                 filter_insight = df_all[
-                    (df_all["Insight Pelayanan"] == "Pelayanan sangat baik") &
-                    (df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")
+                (df_all["Insight Pelayanan"] == "Pelayanan sangat baik") &
+                (df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")
                 ]
 
                 if not filter_insight.empty:
                 for index, row in filter_insight.iterrows():
-                st.markdown(f"- **{row['destination']}** ({row['distance_text']})")
+            st.markdown(f"- **{row['destination']}** ({row['distance_text']})")
+            else:
+            st.info("Belum ada apotek yang memenuhi kedua kriteria tersebut.")
 
-
-                else:
-                    st.info("Belum ada apotek yang memenuhi kedua kriteria tersebut.")
 
         else:
             st.error(f"❌ Lokasi tidak ditemukan: {geo_res['status']}")
