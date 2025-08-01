@@ -196,7 +196,7 @@ if submit and alamat:
 
                 if not filter_insight.empty:
                     for i, row in filter_insight.iterrows():
-                        st.markdown(f"- **{row['destination']}** ({row['Jarak']})")
+                    st.markdown(f"- **{row['destination']}** ({row['distance_text']})")
                 else:
                     st.info("Belum ada apotek yang memenuhi kedua kriteria tersebut.")
 
