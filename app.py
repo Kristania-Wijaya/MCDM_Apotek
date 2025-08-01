@@ -104,6 +104,7 @@ if submit and alamat:
             location = geo_res["results"][0]["geometry"]["location"]
             origin = f"{location['lat']},{location['lng']}"
             st.success(f"✅ Lokasi ditemukan: {origin} (mode: {mode})")
+                results = [get_distance_duration(origin, apotek, mode=mode, api_key=api_key) for apotek in apotek_list]
         else:
             st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
 
