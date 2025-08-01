@@ -104,6 +104,8 @@ if submit and alamat:
             location = geo_res["results"][0]["geometry"]["location"]
             origin = f"{location['lat']},{location['lng']}"
             st.success(f"✅ Lokasi ditemukan: {origin} (mode: {mode})")
+                else:
+            st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
 
             # Hitung Jarak
             with st.spinner("📏 Menghitung jarak ke semua apotek..."):
