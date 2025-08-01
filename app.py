@@ -201,5 +201,3 @@ if submit and alamat:
             st.markdown(f"- **{row['destination']}** ({row['distance_text']})")
     else:
         st.info("🔎 Belum ada apotek yang memenuhi kedua kriteria tersebut.")
-else:
-    st.error("❌ Lokasi tidak ditemukan")
