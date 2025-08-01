@@ -94,7 +94,7 @@ def insight_ketersediaan(skor):
         return "Ketersediaan atau harga perlu ditingkatkan"
 
 # === Proses Perhitungan TOPSIS ===
-if submit and alamat:
+    if submit and alamat:
     with st.spinner("🔎 Mendeteksi lokasi..."):
         geo_url = "https://maps.googleapis.com/maps/api/geocode/json"
         params = {"address": alamat, "key": api_key}
@@ -104,9 +104,13 @@ if submit and alamat:
             location = geo_res["results"][0]["geometry"]["location"]
             origin = f"{location['lat']},{location['lng']}"
             st.success(f"✅ Lokasi ditemukan: {origin} (mode: {mode})")
-                results = [get_distance_duration(origin, apotek, mode=mode, api_key=api_key) for apotek in apotek_list]
+
+            # ✅ indentasi benar di sini
+            results = [get_distance_duration(origin, apotek, mode=mode, api_key=api_key) for apotek in apotek_list]
+
         else:
             st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
+
 
             # Hitung Jarak
             with st.spinner("📏 Menghitung jarak ke semua apotek..."):
