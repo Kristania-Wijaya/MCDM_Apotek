@@ -94,7 +94,8 @@ def insight_ketersediaan(skor):
         return "Ketersediaan atau harga perlu ditingkatkan"
 
 # === Proses Perhitungan TOPSIS ===
-    if submit and alamat:
+# === Proses Perhitungan TOPSIS ===
+if submit and alamat:
     with st.spinner("🔎 Mendeteksi lokasi..."):
         geo_url = "https://maps.googleapis.com/maps/api/geocode/json"
         params = {"address": alamat, "key": api_key}
@@ -104,13 +105,6 @@ def insight_ketersediaan(skor):
             location = geo_res["results"][0]["geometry"]["location"]
             origin = f"{location['lat']},{location['lng']}"
             st.success(f"✅ Lokasi ditemukan: {origin} (mode: {mode})")
-
-            # ✅ indentasi benar di sini
-            results = [get_distance_duration(origin, apotek, mode=mode, api_key=api_key) for apotek in apotek_list]
-
-        else:
-            st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
-
 
             # Hitung Jarak
             with st.spinner("📏 Menghitung jarak ke semua apotek..."):
@@ -146,6 +140,7 @@ def insight_ketersediaan(skor):
                 X = df_all[["Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga", "distance_meters"]].to_numpy().astype(float)
                 norm = np.linalg.norm(X, axis=0)
                 X_norm = X / norm
+
                 # Bobot
                 weights = np.array([
                     bobot_pelayanan / 100,
@@ -193,18 +188,22 @@ def insight_ketersediaan(skor):
 
                 st.dataframe(df_tampil, use_container_width=True)
 
-    # ====== Bagian Ringkasan Insight ======
-    st.markdown("### 🔎 Apotek dengan Pelayanan Sangat Baik & Obat Sangat Lengkap Harga Terjangkau")
+                # ====== Bagian Ringkasan Insight ======
+                st.markdown("### 🔎 Apotek dengan Pelayanan Sangat Baik & Obat Sangat Lengkap Harga Terjangkau")
 
-    # Filter apotek yang memenuhi dua insight terbaik
-    filter_insight = df_all[
-        (df_all["Insight Pelayanan"] == "Pelayanan sangat baik") &
-        (df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")
-    ]
+                # Filter apotek yang memenuhi dua insight terbaik
+                filter_insight = df_all[
+                    (df_all["Insight Pelayanan"] == "Pelayanan sangat baik") &
+                    (df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")
+                ]
 
-    # Menampilkan daftar apotek hasil filter
-    if not filter_insight.empty:
-        for index, row in filter_insight.iterrows():
-            st.markdown(f"- **{row['destination']}** ({row['distance_text']})")
-    else:
-        st.info("🔎 Belum ada apotek yang memenuhi kedua kriteria tersebut.")
+                # Menampilkan daftar apotek hasil filter
+                if not filter_insight.empty:
+                    for index, row in filter_insight.iterrows():
+                        st.markdown(f"- **{row['destination']}** ({row['distance_text']})")
+                else:
+                    st.info("🔎 Belum ada apotek yang memenuhi kedua kriteria tersebut.")
+
+        else:
+            st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
+
