@@ -186,8 +186,6 @@ if submit and alamat:
 
                 st.dataframe(df_tampil, use_container_width=True)
 
-# Mengecek apakah hasil geocoding lokasi pengguna berhasil
-if geo_res["status"] == "OK":
     # ====== Bagian Ringkasan Insight ======
     st.markdown("### 🔎 Apotek dengan Pelayanan Sangat Baik & Obat Sangat Lengkap Harga Terjangkau")
 
