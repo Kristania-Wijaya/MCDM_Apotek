@@ -186,7 +186,7 @@ if submit and alamat:
 
                 st.dataframe(df_tampil, use_container_width=True)
 
-                 # Tambahan ringkasan insight: Apotek dengan pelayanan sangat baik dan obat sangat lengkap
+# Tambahan ringkasan insight: Apotek dengan pelayanan sangat baik dan obat sangat lengkap harga terjangkau
 st.markdown("### 🔎 Apotek dengan Pelayanan Sangat Baik & Obat Sangat Lengkap Harga Terjangkau")
 
 filter_insight = df_all[
