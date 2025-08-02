@@ -185,6 +185,27 @@ if submit and alamat:
                 }).reset_index(drop=True)
 
                 st.dataframe(df_tampil, use_container_width=True)
+                                # Dropdown filter tambahan
+                st.markdown("### 🔍 Filter Hasil Rekomendasi Berdasarkan Aspek")
+                filter_option = st.selectbox("Pilih Filter:", ["Semua", "Pelayanan", "Ketersediaan"])
+
+                if filter_option == "Semua":
+                    df_filtered = df_tampil[
+                        (df_tampil["Insight Pelayanan"] == "Pelayanan sangat baik") &
+                        (df_tampil["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")
+                    ]
+                elif filter_option == "Pelayanan":
+                    df_filtered = df_tampil[df_tampil["Insight Pelayanan"].isin([
+                        "Pelayanan sangat baik", "Pelayanan baik", "Pelayanan perlu ditingkatkan"
+                    ])]
+                elif filter_option == "Ketersediaan":
+                    df_filtered = df_tampil[df_tampil["Insight Ketersediaan"].isin([
+                        "Obat sangat lengkap harga terjangkau",
+                        "Obat cukup lengkap harga cukup terjangkau",
+                        "Ketersediaan atau harga perlu ditingkatkan"
+                    ])]
+
+                st.dataframe(df_filtered, use_container_width=True)
 
         else:
             st.error(f"❌ Lokasi tidak ditemukan: {geo_res['status']}")
