@@ -34,8 +34,8 @@ alamat_user = st.sidebar.text_input("Masukkan Alamat Anda", "Universitas Palangk
 transportasi = st.sidebar.selectbox("Pilih Moda Transportasi", ['driving', 'walking', 'bicycling'])
 
 # === Load Data Apotek & Skor Aspek ===
-df = pd.read_csv("skor_sentimen_per_aspek_apotek.csv")
-api_key = "MASUKKAN_API_KEY_KAMU"  # Ganti dengan API Key milikmu
+df = pd.read_csv("data_skor_sentimen_per_aspek_apotek.csv")
+api_key = "AIzaSyBqMqXOO-8ZrsSPMQXMeUVYmG-zDHnKeL0"  # Ganti dengan API Key milikmu
 
 # === Hitung Jarak Apotek dari Lokasi User ===
 with st.spinner("Menghitung jarak ke apotek..."):
