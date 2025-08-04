@@ -182,6 +182,3 @@ df_tampil = df_filtered.sort_values("topsis_score", ascending=False)[[
 }).reset_index(drop=True)
 
 st.dataframe(df_tampil, use_container_width=True)
-
-        else:
-            st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
