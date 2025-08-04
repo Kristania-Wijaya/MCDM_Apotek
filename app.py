@@ -105,13 +105,14 @@ if submit and alamat:
             location = geo_res["results"][0]["geometry"]["location"]
             origin = f"{location['lat']},{location['lng']}"
             st.success(f"✅ Lokasi ditemukan: {origin} (mode: {mode})")
-        else:
-            st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
+      
 
             # Hitung Jarak
             with st.spinner("📏 Menghitung jarak ke semua apotek..."):
                 results = [get_distance_duration(origin, apotek, mode=mode, api_key=api_key) for apotek in apotek_list]
                 df_jarak = pd.DataFrame(results)
+            else:
+            st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.") 
 
             # Load Sentimen
             df_sentimen = pd.read_csv("data_skor_sentimen_per_aspek_apotek.csv")
