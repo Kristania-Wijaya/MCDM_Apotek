@@ -106,7 +106,6 @@ if submit and alamat:
             origin = f"{location['lat']},{location['lng']}"
             st.success(f"✅ Lokasi ditemukan: {origin} (mode: {mode})")
       
-
             # Hitung Jarak
             with st.spinner("📏 Menghitung jarak ke semua apotek..."):
                 results = [get_distance_duration(origin, apotek, mode=mode, api_key=api_key) for apotek in apotek_list]
