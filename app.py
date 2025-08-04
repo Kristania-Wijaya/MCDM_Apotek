@@ -189,9 +189,9 @@ if 'df_all' in locals():
             (df_topsis_sorted["Insight Pelayanan"] == "Pelayanan sangat baik") &
             (df_topsis_sorted["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")
         ]
-        st.markdown("### ✅ Apotek dengan Pelayanan dan Ketersediaan Terbaik (urut berdasarkan TOPSIS)")
+        st.markdown("### ✅ Apotek dengan Pelayanan dan Ketersediaan Terbaik")
         st.dataframe(df_filt[[
-            "destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
+            "Destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
             "Ketersediaan Obat dan Harga", "Insight Ketersediaan",
             "Skor Sentimen", "Nilai Topsis"
         ]].rename(columns={
@@ -202,20 +202,20 @@ if 'df_all' in locals():
         df_filt = df_topsis_sorted[df_topsis_sorted["Insight Pelayanan"] == "Pelayanan sangat baik"]
         st.markdown("### ✅ Apotek Berdasarkan Pelayanan (urut berdasarkan TOPSIS)")
         st.dataframe(df_filt[[
-            "destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
+            "Destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
             "Skor Sentimen", "Nilai Topsis"
         ]].rename(columns={
-            "destination": "Apotek"
+            "Destination": "Apotek"
         }), use_container_width=True)
 
     elif aspek_pilihan == "Ketersediaan":
         df_filt = df_topsis_sorted[df_topsis_sorted["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau"]
         st.markdown("### ✅ Apotek Berdasarkan Ketersediaan Obat (urut berdasarkan TOPSIS)")
         st.dataframe(df_filt[[
-            "destination", "Ketersediaan Obat dan Harga", "Insight Ketersediaan",
+            "Destination", "Ketersediaan Obat dan Harga", "Insight Ketersediaan",
             "Skor Sentimen", "Nilai Topsis"
         ]].rename(columns={
-            "destination": "Apotek"
+            "Destination": "Apotek"
         }), use_container_width=True)
 else:
     st.info("Masukkan alamat terlebih dahulu untuk menggunakan filter berbasis TOPSIS.")
