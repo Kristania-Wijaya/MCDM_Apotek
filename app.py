@@ -185,6 +185,32 @@ if submit and alamat:
                 }).reset_index(drop=True)
 
                 st.dataframe(df_tampil, use_container_width=True)
+                st.markdown("## 🔍 Filter Berdasarkan Aspek")
+
+filter_aspek = st.selectbox(
+    "Pilih aspek yang ingin difilter:",
+    ["Semua", "Pelayanan", "Ketersediaan"]
+)
+
+# Filter data sesuai pilihan
+if filter_aspek == "Pelayanan":
+    df_filtered = df_ranked[df_ranked["pelayanan_dan_fasilitas"] > 0]
+elif filter_aspek == "Ketersediaan":
+    df_filtered = df_ranked[df_ranked["ketersediaan_obat_dan_harga"] > 0]
+else:
+    df_filtered = df_ranked.copy()
+
+# Tampilkan tabel sesuai kolom yang diminta
+tabel_aspek = df_filtered[[
+    "destination",
+    "pelayanan_dan_fasilitas",
+    "insight_pelayanan",
+    "ketersediaan_obat_dan_harga",
+    "insight_ketersediaan"
+]]
+
+st.dataframe(tabel_aspek, use_container_width=True)
+
 
         else:
             st.error(f"❌ Lokasi tidak ditemukan: {geo_res['status']}")
