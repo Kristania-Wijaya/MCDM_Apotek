@@ -94,6 +94,7 @@ def insight_ketersediaan(skor):
         return "Ketersediaan atau harga perlu ditingkatkan"
 
 # === Proses Perhitungan TOPSIS ===
+# === Proses Perhitungan TOPSIS ===
 if submit and alamat:
     with st.spinner("🔎 Mendeteksi lokasi..."):
         geo_url = "https://maps.googleapis.com/maps/api/geocode/json"
@@ -139,6 +140,7 @@ if submit and alamat:
                 X = df_all[["Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga", "distance_meters"]].to_numpy().astype(float)
                 norm = np.linalg.norm(X, axis=0)
                 X_norm = X / norm
+
                 # Bobot
                 weights = np.array([
                     bobot_pelayanan / 100,
@@ -186,39 +188,21 @@ if submit and alamat:
 
                 st.dataframe(df_tampil, use_container_width=True)
 
-                # === Filter Tambahan Berdasarkan Aspek ===
-                st.markdown("## 🔍 Filter Berdasarkan Aspek")
+                # ====== Bagian Ringkasan Insight ======
+                st.markdown("### 🔎 Apotek dengan Pelayanan Sangat Baik & Obat Sangat Lengkap Harga Terjangkau")
 
-                filter_aspek = st.selectbox(
-                    "Pilih aspek yang ingin difilter:",
-                    ["Semua", "Pelayanan", "Ketersediaan"]
-                )
+                # Filter apotek yang memenuhi dua insight terbaik
+                filter_insight = df_all[
+                    (df_all["Insight Pelayanan"] == "Pelayanan sangat baik") &
+                    (df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")
+                ]
 
-                # Filter data sesuai pilihan
-                if filter_aspek == "Pelayanan":
-                    df_filtered = df_all[df_all["Pelayanan dan Fasilitas"] > 0]
-                elif filter_aspek == "Ketersediaan":
-                    df_filtered = df_all[df_all["Ketersediaan Obat dan Harga"] > 0]
+                # Menampilkan daftar apotek hasil filter
+                if not filter_insight.empty:
+                    for index, row in filter_insight.iterrows():
+                        st.markdown(f"- **{row['destination']}** ({row['distance_text']})")
                 else:
-                    df_filtered = df_all.copy()
-
-                # Tampilkan kolom yang diminta
-                tabel_aspek = df_filtered[[
-                    "destination",
-                    "Pelayanan dan Fasilitas",
-                    "Insight Pelayanan",
-                    "Ketersediaan Obat dan Harga",
-                    "Insight Ketersediaan"
-                ]].rename(columns={
-                    "destination": "Apotek",
-                    "Pelayanan dan Fasilitas": "Skor Pelayanan",
-                    "Insight Pelayanan": "Insight Pelayanan",
-                    "Ketersediaan Obat dan Harga": "Skor Ketersediaan",
-                    "Insight Ketersediaan": "Insight Ketersediaan"
-                })
-
-                st.dataframe(tabel_aspek, use_container_width=True)
-
+                    st.info("🔎 Belum ada apotek yang memenuhi kedua kriteria tersebut.")
 
         else:
-            st.error(f"❌ Lokasi tidak ditemukan: {geo_res['status']}")
+            st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
