@@ -188,21 +188,32 @@ if submit and alamat:
 
                 st.dataframe(df_tampil, use_container_width=True)
 
-                # ====== Bagian Ringkasan Insight ======
-                st.markdown("### 🔎 Apotek dengan Pelayanan Sangat Baik & Obat Sangat Lengkap Harga Terjangkau")
+st.markdown("## 🌟 Rekomendasi Apotek Unggulan")
+st.markdown("Apotek dengan **Pelayanan sangat baik** dan **Obat sangat lengkap harga terjangkau**:")
 
-                # Filter apotek yang memenuhi dua insight terbaik
-                filter_insight = df_all[
-                    (df_all["Insight Pelayanan"] == "Pelayanan sangat baik") &
-                    (df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")
-                ]
+# Filter unggulan
+filter_insight = df_all[
+    (df_all["Insight Pelayanan"] == "Pelayanan sangat baik") &
+    (df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")
+]
 
-                # Menampilkan daftar apotek hasil filter
-                if not filter_insight.empty:
-                    for index, row in filter_insight.iterrows():
-                        st.markdown(f"- **{row['destination']}** ({row['distance_text']})")
-                else:
-                    st.info("🔎 Belum ada apotek yang memenuhi kedua kriteria tersebut.")
+if not filter_insight.empty:
+    for i, row in filter_insight.iterrows():
+        with st.container():
+            col1, col2 = st.columns([1, 3])
+            with col1:
+                st.metric("🏥", row["destination"])
+                st.write(f"📍 {row['distance_text']}")
+            with col2:
+                st.markdown(f"""
+                **Pelayanan:** {row["Insight Pelayanan"]}  
+                **Ketersediaan:** {row["Insight Ketersediaan"]}  
+                **Skor Sentimen:** {row['Skor Sentimen Keseluruhan']:.2f}  
+                **Skor TOPSIS:** {row['topsis_score']:.4f}
+                """)
+            st.markdown("---")
+else:
+    st.info("🔎 Belum ada apotek yang memenuhi kedua kriteria tersebut.")
 
         else:
             st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
