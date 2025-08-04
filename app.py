@@ -177,36 +177,36 @@ if submit and alamat:
         else:
             st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
 
-# === Fitur Filter Mandiri Tanpa Lokasi ===
-st.subheader("🔍 Filter Berdasarkan Aspek")
-try:
-    df_all_simple = pd.read_csv("data_skor_sentimen_per_aspek_apotek.csv")
-    df_pivot_simple = df_all_simple.pivot_table(index='apotek', columns='Dominant_Aspect',
-                                                values='skor_sentimen_positif', aggfunc='first').reset_index()
-    df_pivot_simple = df_pivot_simple.rename(columns={"apotek": "destination"})
-    df_pivot_simple["Insight Pelayanan"] = df_pivot_simple["Pelayanan dan Fasilitas"].apply(insight_pelayanan)
-    df_pivot_simple["Insight Ketersediaan"] = df_pivot_simple["Ketersediaan Obat dan Harga"].apply(insight_ketersediaan)
+# === Filter Berdasarkan Aspek dari HASIL TOPSIS ===
+if submit and alamat and not df_all.empty:
+    st.subheader("🔎 Filter Apotek Berdasarkan Aspek (berdasarkan hasil TOPSIS)")
 
-    aspek_pilihan = st.selectbox("Pilih aspek:", ["Semua", "Pelayanan", "Ketersediaan"])
+    aspek_filter = st.selectbox("Pilih aspek:", ["Semua", "Pelayanan", "Ketersediaan", "Jarak"])
 
-    if aspek_pilihan == "Semua":
-        df_filt = df_pivot_simple[
-            (df_pivot_simple["Insight Pelayanan"] == "Pelayanan sangat baik") &
-            (df_pivot_simple["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")
-        ]
-        st.markdown("### ✅ Apotek dengan Pelayanan dan Ketersediaan Terbaik")
-        st.dataframe(df_filt[["destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
-                              "Ketersediaan Obat dan Harga", "Insight Ketersediaan"]])
+    df_filtered = df_tampil.copy()
 
-    elif aspek_pilihan == "Pelayanan":
-        st.markdown("### ✅ Apotek Berdasarkan Pelayanan")
-        df_filt = df_pivot_simple.sort_values(by="Pelayanan dan Fasilitas", ascending=False)
-        st.dataframe(df_filt[["destination", "Pelayanan dan Fasilitas", "Insight Pelayanan"]])
+    if aspek_filter == "Pelayanan":
+        df_filtered = df_filtered.sort_values(by="Pelayanan dan Fasilitas", ascending=False)
+        st.markdown("### ✅ Apotek Berdasarkan Pelayanan (Urutan dari terbaik)")
+        st.dataframe(df_filtered[[
+            "Rank", "Destination", "Pelayanan dan Fasilitas", "Insight Pelayanan", "Nilai Topsis"
+        ]])
 
-    elif aspek_pilihan == "Ketersediaan":
-        st.markdown("### ✅ Apotek Berdasarkan Ketersediaan Obat")
-        df_filt = df_pivot_simple.sort_values(by="Ketersediaan Obat dan Harga", ascending=False)
-        st.dataframe(df_filt[["destination", "Ketersediaan Obat dan Harga", "Insight Ketersediaan"]])
+    elif aspek_filter == "Ketersediaan":
+        df_filtered = df_filtered.sort_values(by="Ketersediaan Obat dan Harga", ascending=False)
+        st.markdown("### ✅ Apotek Berdasarkan Ketersediaan Obat (Urutan dari terbaik)")
+        st.dataframe(df_filtered[[
+            "Rank", "Destination", "Ketersediaan Obat dan Harga", "Insight Ketersediaan", "Nilai Topsis"
+        ]])
 
-except Exception as e:
-    st.warning("❗ Gagal memuat data untuk filter aspek. Pastikan file CSV tersedia dan sesuai.")
+    elif aspek_filter == "Jarak":
+        df_filtered = df_filtered.sort_values(by="Jarak", ascending=True)
+        st.markdown("### ✅ Apotek Terdekat (Berdasarkan Jarak)")
+        st.dataframe(df_filtered[[
+            "Rank", "Destination", "Jarak", "Nilai Topsis"
+        ]])
+
+    else:
+        st.markdown("### ✅ Apotek dengan Kombinasi Aspek Terbaik (Skor TOPSIS)")
+        st.dataframe(df_tampil)
+
