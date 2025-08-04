@@ -204,5 +204,31 @@ if submit and alamat:
                 else:
                     st.info("🔎 Belum ada apotek yang memenuhi kedua kriteria tersebut.")
 
+                        st.markdown("## 🔍 Filter Berdasarkan Aspek")
+
+                filter_aspek = st.selectbox(
+                    "Tampilkan apotek berdasarkan aspek:",
+                    ["Semua", "Pelayanan", "Ketersediaan"]
+                )
+
+                if filter_aspek == "Pelayanan":
+                    df_filtered = df_all[df_all["Pelayanan dan Fasilitas"] >= 76]
+                elif filter_aspek == "Ketersediaan":
+                    df_filtered = df_all[df_all["Ketersediaan Obat dan Harga"] >= 76]
+                else:
+                    df_filtered = df_all.copy()
+
+                df_insight = df_filtered[[
+                    "destination",
+                    "Pelayanan dan Fasilitas",
+                    "Insight Pelayanan",
+                    "Ketersediaan Obat dan Harga",
+                    "Insight Ketersediaan"
+                ]].rename(columns={
+                    "destination": "Apotek"
+                }).sort_values(by="Apotek").reset_index(drop=True)
+
+                st.dataframe(df_insight, use_container_width=True)
+
         else:
             st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
