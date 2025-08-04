@@ -110,7 +110,7 @@ if submit and alamat:
             with st.spinner("📏 Menghitung jarak ke semua apotek..."):
                 results = [get_distance_duration(origin, apotek, mode=mode, api_key=api_key) for apotek in apotek_list]
                 df_jarak = pd.DataFrame(results)
-         else:
+        else:
             st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.") 
 
             # Load Sentimen
