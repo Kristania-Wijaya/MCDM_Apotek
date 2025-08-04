@@ -204,7 +204,7 @@ if submit and alamat:
                 else:
                     st.info("🔎 Belum ada apotek yang memenuhi kedua kriteria tersebut.")
 
-                        st.markdown("## 🔍 Filter Berdasarkan Aspek")
+                st.markdown("## 🔍 Filter Berdasarkan Aspek")
 
                 filter_aspek = st.selectbox(
                     "Tampilkan apotek berdasarkan aspek:",
