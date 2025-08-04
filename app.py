@@ -185,31 +185,39 @@ if submit and alamat:
                 }).reset_index(drop=True)
 
                 st.dataframe(df_tampil, use_container_width=True)
+
+                # === Filter Tambahan Berdasarkan Aspek ===
                 st.markdown("## 🔍 Filter Berdasarkan Aspek")
 
-filter_aspek = st.selectbox(
-    "Pilih aspek yang ingin difilter:",
-    ["Semua", "Pelayanan", "Ketersediaan"]
-)
+                filter_aspek = st.selectbox(
+                    "Pilih aspek yang ingin difilter:",
+                    ["Semua", "Pelayanan", "Ketersediaan"]
+                )
 
-# Filter data sesuai pilihan
-if filter_aspek == "Pelayanan":
-    df_filtered = df_ranked[df_ranked["pelayanan_dan_fasilitas"] > 0]
-elif filter_aspek == "Ketersediaan":
-    df_filtered = df_ranked[df_ranked["ketersediaan_obat_dan_harga"] > 0]
-else:
-    df_filtered = df_ranked.copy()
+                # Filter data sesuai pilihan
+                if filter_aspek == "Pelayanan":
+                    df_filtered = df_all[df_all["Pelayanan dan Fasilitas"] > 0]
+                elif filter_aspek == "Ketersediaan":
+                    df_filtered = df_all[df_all["Ketersediaan Obat dan Harga"] > 0]
+                else:
+                    df_filtered = df_all.copy()
 
-# Tampilkan tabel sesuai kolom yang diminta
-tabel_aspek = df_filtered[[
-    "destination",
-    "pelayanan_dan_fasilitas",
-    "insight_pelayanan",
-    "ketersediaan_obat_dan_harga",
-    "insight_ketersediaan"
-]]
+                # Tampilkan kolom yang diminta
+                tabel_aspek = df_filtered[[
+                    "destination",
+                    "Pelayanan dan Fasilitas",
+                    "Insight Pelayanan",
+                    "Ketersediaan Obat dan Harga",
+                    "Insight Ketersediaan"
+                ]].rename(columns={
+                    "destination": "Apotek",
+                    "Pelayanan dan Fasilitas": "Skor Pelayanan",
+                    "Insight Pelayanan": "Insight Pelayanan",
+                    "Ketersediaan Obat dan Harga": "Skor Ketersediaan",
+                    "Insight Ketersediaan": "Insight Ketersediaan"
+                })
 
-st.dataframe(tabel_aspek, use_container_width=True)
+                st.dataframe(tabel_aspek, use_container_width=True)
 
 
         else:
