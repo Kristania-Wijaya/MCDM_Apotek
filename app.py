@@ -168,7 +168,7 @@ elif aspek_filter == "Ketersediaan":
 
                 st.caption(f"Bobot → Pelayanan: {bobot_pelayanan}%, Ketersediaan: {bobot_harga}%, Jarak: {bobot_jarak}%")
 
-                df_tampil = df_all.sort_values("topsis_score", ascending=False)[[
+                    df_tampil = df_filtered.sort_values("topsis_score", ascending=False)[[
                     "rank", "destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
                     "Ketersediaan Obat dan Harga", "Insight Ketersediaan",
                     "distance_text", "Skor Sentimen Keseluruhan", "topsis_score"
@@ -183,4 +183,4 @@ elif aspek_filter == "Ketersediaan":
                 st.dataframe(df_tampil, use_container_width=True)
 
         else:
-            st.error(f"❌ Lokasi tidak ditemukan: {geo_res['status']}")
+            st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
