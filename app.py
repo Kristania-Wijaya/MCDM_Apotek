@@ -148,13 +148,13 @@ if submit and alamat:
                 df_all["topsis_score"] = preference
                 df_all["rank"] = df_all["topsis_score"].rank(ascending=False).astype(int)
 
-               st.subheader("📊 Rekomendasi Apotek Terbaik")
-               st.caption(f"Bobot → Pelayanan: {bobot_pelayanan}%, Ketersediaan: {bobot_harga}%, Jarak: {bobot_jarak}%")
+                st.subheader("📊 Rekomendasi Apotek Terbaik")
+                st.caption(f"Bobot → Pelayanan: {bobot_pelayanan}%, Ketersediaan: {bobot_harga}%, Jarak: {bobot_jarak}%")
 
-               # 🔽 Tambahkan dropdown filter di sini
-               aspek_filter = st.selectbox("🔽 Filter rekomendasi berdasarkan aspek:", ["Semua", "Pelayanan", "Ketersediaan"])
+             # 🔽 Tambahkan dropdown filter di sini
+aspek_filter = st.selectbox("🔽 Filter rekomendasi berdasarkan aspek:", ["Semua", "Pelayanan", "Ketersediaan"])
 
-               # Filter sesuai pilihan dropdown
+# Filter sesuai dropdown
 if aspek_filter == "Semua":
     df_filtered = df_all[
         (df_all["Insight Pelayanan"] == "Pelayanan sangat baik") &
@@ -168,14 +168,14 @@ elif aspek_filter == "Ketersediaan":
     df_filtered = df_all[df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau"]
     st.markdown("💊 Apotek dengan **Obat sangat lengkap dan harga terjangkau**")
 
-# Tampilkan tabel hasil rekomendasi
+# Tampilkan hasil akhir
 df_tampil = df_filtered.sort_values("topsis_score", ascending=False)[[
     "rank", "destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
     "Ketersediaan Obat dan Harga", "Insight Ketersediaan",
     "distance_text", "Skor Sentimen Keseluruhan", "topsis_score"
 ]].rename(columns={
     "rank": "Rank",
-    "destination": "Destination",
+    "destination": "Apotek",
     "distance_text": "Jarak",
     "Skor Sentimen Keseluruhan": "Skor Sentimen",
     "topsis_score": "Nilai Topsis"
