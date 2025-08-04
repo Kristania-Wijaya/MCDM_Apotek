@@ -151,7 +151,26 @@ if submit and alamat:
 
                 st.subheader("📊 Rekomendasi Apotek Terbaik")
 
-                # Filter sesuai dropdown
+                st.caption(f"Bobot → Pelayanan: {bobot_pelayanan}%, Ketersediaan: {bobot_harga}%, Jarak: {bobot_jarak}%")
+
+                df_tampil = df_all.sort_values("topsis_score", ascending=False)[[
+                    "rank", "destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
+                    "Ketersediaan Obat dan Harga", "Insight Ketersediaan",
+                    "distance_text", "Skor Sentimen Keseluruhan", "topsis_score"
+                ]].rename(columns={
+                    "rank": "Rank",
+                    "destination": "Destination",
+                    "distance_text": "Jarak",
+                    "Skor Sentimen Keseluruhan": "Skor Sentimen",
+                    "topsis_score": "Nilai Topsis"
+                }).reset_index(drop=True)
+
+                st.dataframe(df_tampil, use_container_width=True)
+
+        else:
+            st.error(f"❌ Lokasi tidak ditemukan: {geo_res['status']}")
+
+# Filter sesuai dropdown
                 if aspek_filter == "Semua":
                     df_filtered = df_all[(df_all["Insight Pelayanan"] == "Pelayanan sangat baik") &
                                          (df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")]
@@ -181,6 +200,3 @@ if submit and alamat:
                     st.dataframe(df_filtered, use_container_width=True)
                 else:
                     st.warning("❌ Tidak ada apotek yang memenuhi filter ini.")
-
-        else:
-            st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
