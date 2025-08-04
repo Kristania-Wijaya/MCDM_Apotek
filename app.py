@@ -174,38 +174,11 @@ if submit and alamat:
 
                 st.dataframe(df_tampil, use_container_width=True)
 
-                # === Fitur Filtering ===
-                st.subheader("🔍 Filter Berdasarkan Aspek")
-                aspek = st.selectbox("Pilih aspek yang ingin difokuskan:", ["Semua", "Pelayanan", "Ketersediaan"])
-
-                if aspek == "Semua":
-                    st.markdown("### 🔍 Apotek dengan Pelayanan Sangat Baik & Obat Sangat Lengkap Harga Terjangkau")
-                    filter_all = df_all[
-                        (df_all["Insight Pelayanan"] == "Pelayanan sangat baik") &
-                        (df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")
-                    ].sort_values(by=["Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga"], ascending=False)
-
-                    if not filter_all.empty:
-                        st.dataframe(filter_all[["destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
-                                                 "Ketersediaan Obat dan Harga", "Insight Ketersediaan"]])
-                    else:
-                        st.info("Belum ada apotek yang memenuhi dua kriteria terbaik.")
-
-                elif aspek == "Pelayanan":
-                    st.markdown("### 🔍 Apotek dengan Pelayanan Terbaik")
-                    pelayanan_df = df_all.sort_values(by="Pelayanan dan Fasilitas", ascending=False)
-                    st.dataframe(pelayanan_df[["destination", "Pelayanan dan Fasilitas", "Insight Pelayanan"]])
-
-                elif aspek == "Ketersediaan":
-                    st.markdown("### 🔍 Apotek dengan Ketersediaan Obat Terbaik")
-                    ketersediaan_df = df_all.sort_values(by="Ketersediaan Obat dan Harga", ascending=False)
-                    st.dataframe(ketersediaan_df[["destination", "Ketersediaan Obat dan Harga", "Insight Ketersediaan"]])
-
         else:
             st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
 
 # === Fitur Filter Mandiri Tanpa Lokasi ===
-st.subheader("🔍 Filter Berdasarkan Aspek (Tanpa Rekomendasi Jarak)")
+st.subheader("🔍 Filter Berdasarkan Aspek")
 try:
     df_all_simple = pd.read_csv("data_skor_sentimen_per_aspek_apotek.csv")
     df_pivot_simple = df_all_simple.pivot_table(index='apotek', columns='Dominant_Aspect',
