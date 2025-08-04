@@ -94,7 +94,6 @@ def insight_ketersediaan(skor):
         return "Ketersediaan atau harga perlu ditingkatkan"
 
 # === Proses Perhitungan TOPSIS ===
-# === Proses Perhitungan TOPSIS ===
 if submit and alamat:
     with st.spinner("🔎 Mendeteksi lokasi..."):
         geo_url = "https://maps.googleapis.com/maps/api/geocode/json"
@@ -105,13 +104,11 @@ if submit and alamat:
             location = geo_res["results"][0]["geometry"]["location"]
             origin = f"{location['lat']},{location['lng']}"
             st.success(f"✅ Lokasi ditemukan: {origin} (mode: {mode})")
-      
+
             # Hitung Jarak
             with st.spinner("📏 Menghitung jarak ke semua apotek..."):
                 results = [get_distance_duration(origin, apotek, mode=mode, api_key=api_key) for apotek in apotek_list]
                 df_jarak = pd.DataFrame(results)
-        else:
-            st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.") 
 
             # Load Sentimen
             df_sentimen = pd.read_csv("data_skor_sentimen_per_aspek_apotek.csv")
@@ -142,7 +139,6 @@ if submit and alamat:
                 X = df_all[["Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga", "distance_meters"]].to_numpy().astype(float)
                 norm = np.linalg.norm(X, axis=0)
                 X_norm = X / norm
-
                 # Bobot
                 weights = np.array([
                     bobot_pelayanan / 100,
@@ -190,40 +186,5 @@ if submit and alamat:
 
                 st.dataframe(df_tampil, use_container_width=True)
 
-st.markdown("## 🔍 Filter Berdasarkan Aspek")
-
-filter_aspek = st.selectbox(
-    "Tampilkan apotek berdasarkan aspek:",
-    ["Semua", "Pelayanan", "Ketersediaan"]
-)
-
-if filter_aspek == "Semua":
-    df_filtered = df_all[
-        (df_all["Insight Pelayanan"] == "Pelayanan sangat baik") &
-        (df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")
-    ].copy()
-    
-    df_filtered["Skor Gabungan"] = df_filtered["Pelayanan dan Fasilitas"] + df_filtered["Ketersediaan Obat dan Harga"]
-    df_filtered = df_filtered.sort_values(by="Skor Gabungan", ascending=False)
-
-    st.markdown("**Apotek dengan Pelayanan Sangat Baik & Obat Sangat Lengkap Harga Terjangkau**")
-    st.dataframe(df_filtered[[
-        "destination",
-        "Pelayanan dan Fasilitas", "Insight Pelayanan",
-        "Ketersediaan Obat dan Harga", "Insight Ketersediaan"
-    ]].rename(columns={"destination": "Apotek"}), use_container_width=True)
-
-elif filter_aspek == "Pelayanan":
-    df_filtered = df_all.sort_values(by="Pelayanan dan Fasilitas", ascending=False)
-    st.markdown("**Urut berdasarkan skor pelayanan terbaik**")
-    st.dataframe(df_filtered[[
-        "destination", "Pelayanan dan Fasilitas", "Insight Pelayanan"
-    ]].rename(columns={"destination": "Apotek"}), use_container_width=True)
-
-elif filter_aspek == "Ketersediaan":
-    df_filtered = df_all.sort_values(by="Ketersediaan Obat dan Harga", ascending=False)
-    st.markdown("**Urut berdasarkan skor ketersediaan obat terbaik**")
-    st.dataframe(df_filtered[[
-        "destination", "Ketersediaan Obat dan Harga", "Insight Ketersediaan"
-    ]].rename(columns={"destination": "Apotek"}), use_container_width=True)
-
+        else:
+            st.error(f"❌ Lokasi tidak ditemukan: {geo_res['status']}")
