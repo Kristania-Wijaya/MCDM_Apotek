@@ -105,6 +105,8 @@ if submit and alamat:
             location = geo_res["results"][0]["geometry"]["location"]
             origin = f"{location['lat']},{location['lng']}"
             st.success(f"✅ Lokasi ditemukan: {origin} (mode: {mode})")
+        else:
+            st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
 
             # Hitung Jarak
             with st.spinner("📏 Menghitung jarak ke semua apotek..."):
@@ -188,47 +190,40 @@ if submit and alamat:
 
                 st.dataframe(df_tampil, use_container_width=True)
 
-                # ====== Bagian Ringkasan Insight ======
-                st.markdown("### 🔎 Apotek dengan Pelayanan Sangat Baik & Obat Sangat Lengkap Harga Terjangkau")
+st.markdown("## 🔍 Filter Berdasarkan Aspek")
 
-                # Filter apotek yang memenuhi dua insight terbaik
-                filter_insight = df_all[
-                    (df_all["Insight Pelayanan"] == "Pelayanan sangat baik") &
-                    (df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")
-                ]
+filter_aspek = st.selectbox(
+    "Tampilkan apotek berdasarkan aspek:",
+    ["Semua", "Pelayanan", "Ketersediaan"]
+)
 
-                # Menampilkan daftar apotek hasil filter
-                if not filter_insight.empty:
-                    for index, row in filter_insight.iterrows():
-                        st.markdown(f"- **{row['destination']}** ({row['distance_text']})")
-                else:
-                    st.info("🔎 Belum ada apotek yang memenuhi kedua kriteria tersebut.")
+if filter_aspek == "Semua":
+    df_filtered = df_all[
+        (df_all["Insight Pelayanan"] == "Pelayanan sangat baik") &
+        (df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")
+    ].copy()
+    
+    df_filtered["Skor Gabungan"] = df_filtered["Pelayanan dan Fasilitas"] + df_filtered["Ketersediaan Obat dan Harga"]
+    df_filtered = df_filtered.sort_values(by="Skor Gabungan", ascending=False)
 
-                st.markdown("## 🔍 Filter Berdasarkan Aspek")
+    st.markdown("**Apotek dengan Pelayanan Sangat Baik & Obat Sangat Lengkap Harga Terjangkau**")
+    st.dataframe(df_filtered[[
+        "destination",
+        "Pelayanan dan Fasilitas", "Insight Pelayanan",
+        "Ketersediaan Obat dan Harga", "Insight Ketersediaan"
+    ]].rename(columns={"destination": "Apotek"}), use_container_width=True)
 
-                filter_aspek = st.selectbox(
-                    "Tampilkan apotek berdasarkan aspek:",
-                    ["Semua", "Pelayanan", "Ketersediaan"]
-                )
+elif filter_aspek == "Pelayanan":
+    df_filtered = df_all.sort_values(by="Pelayanan dan Fasilitas", ascending=False)
+    st.markdown("**Urut berdasarkan skor pelayanan terbaik**")
+    st.dataframe(df_filtered[[
+        "destination", "Pelayanan dan Fasilitas", "Insight Pelayanan"
+    ]].rename(columns={"destination": "Apotek"}), use_container_width=True)
 
-                if filter_aspek == "Pelayanan":
-                    df_filtered = df_all[df_all["Pelayanan dan Fasilitas"] >= 76]
-                elif filter_aspek == "Ketersediaan":
-                    df_filtered = df_all[df_all["Ketersediaan Obat dan Harga"] >= 76]
-                else:
-                    df_filtered = df_all.copy()
+elif filter_aspek == "Ketersediaan":
+    df_filtered = df_all.sort_values(by="Ketersediaan Obat dan Harga", ascending=False)
+    st.markdown("**Urut berdasarkan skor ketersediaan obat terbaik**")
+    st.dataframe(df_filtered[[
+        "destination", "Ketersediaan Obat dan Harga", "Insight Ketersediaan"
+    ]].rename(columns={"destination": "Apotek"}), use_container_width=True)
 
-                df_insight = df_filtered[[
-                    "destination",
-                    "Pelayanan dan Fasilitas",
-                    "Insight Pelayanan",
-                    "Ketersediaan Obat dan Harga",
-                    "Insight Ketersediaan"
-                ]].rename(columns={
-                    "destination": "Apotek"
-                }).sort_values(by="Apotek").reset_index(drop=True)
-
-                st.dataframe(df_insight, use_container_width=True)
-
-        else:
-            st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
