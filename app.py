@@ -179,34 +179,27 @@ if submit and alamat:
 
 # === Filter Berdasarkan Aspek dari HASIL TOPSIS ===
 if submit and alamat and not df_all.empty:
-    st.subheader("🔎 Filter Apotek Berdasarkan Aspek (berdasarkan hasil TOPSIS)")
+    st.subheader("🔎 Filter Apotek Berdasarkan Aspek")
 
-    aspek_filter = st.selectbox("Pilih aspek:", ["Semua", "Pelayanan", "Ketersediaan", "Jarak"])
+    aspek_filter = st.selectbox("Pilih aspek:", ["Semua", "Pelayanan", "Ketersediaan"])
 
     df_filtered = df_tampil.copy()
 
     if aspek_filter == "Pelayanan":
         df_filtered = df_filtered.sort_values(by="Pelayanan dan Fasilitas", ascending=False)
-        st.markdown("### ✅ Apotek Berdasarkan Pelayanan (Urutan dari terbaik)")
+        st.markdown("### ✅ Apotek Berdasarkan Pelayanan")
         st.dataframe(df_filtered[[
-            "Rank", "Destination", "Pelayanan dan Fasilitas", "Insight Pelayanan", "Nilai Topsis"
+            "Rank", "Destination", "Pelayanan dan Fasilitas", "Insight Pelayanan"
         ]])
 
     elif aspek_filter == "Ketersediaan":
         df_filtered = df_filtered.sort_values(by="Ketersediaan Obat dan Harga", ascending=False)
-        st.markdown("### ✅ Apotek Berdasarkan Ketersediaan Obat (Urutan dari terbaik)")
+        st.markdown("### ✅ Apotek Berdasarkan Ketersediaan Obat")
         st.dataframe(df_filtered[[
-            "Rank", "Destination", "Ketersediaan Obat dan Harga", "Insight Ketersediaan", "Nilai Topsis"
-        ]])
-
-    elif aspek_filter == "Jarak":
-        df_filtered = df_filtered.sort_values(by="Jarak", ascending=True)
-        st.markdown("### ✅ Apotek Terdekat (Berdasarkan Jarak)")
-        st.dataframe(df_filtered[[
-            "Rank", "Destination", "Jarak", "Nilai Topsis"
+            "Rank", "Destination", "Ketersediaan Obat dan Harga", "Insight Ketersediaan"
         ]])
 
     else:
-        st.markdown("### ✅ Apotek dengan Kombinasi Aspek Terbaik (Skor TOPSIS)")
+        st.markdown("### ✅ Apotek dengan Kombinasi Aspek Terbaik")
         st.dataframe(df_tampil)
 
