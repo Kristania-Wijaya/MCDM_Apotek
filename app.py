@@ -52,7 +52,6 @@ else:
 # === Input Lokasi ===
 alamat = st.text_input("📍 Masukkan alamat Anda:", placeholder="Contoh: Universitas Palangka Raya")
 mode = st.selectbox("Pilih moda transportasi", ["driving", "two-wheeler", "walking"])
-aspek_filter = st.selectbox("Pilih filter rekomendasi", ["Semua", "Pelayanan", "Ketersediaan"])
 submit = st.button("🔍 Cari dan Hitung Rekomendasi") if valid_bobot else None
 
 # === Fungsi: Hitung jarak Google Maps ===
@@ -150,6 +149,22 @@ if submit and alamat:
                 df_all["rank"] = df_all["topsis_score"].rank(ascending=False).astype(int)
 
                 st.subheader("📊 Rekomendasi Apotek Terbaik")
+                
+# 🔽 Tambahkan dropdown filter di sini
+aspek_filter = st.selectbox("🔽 Filter rekomendasi berdasarkan aspek:", ["Semua", "Pelayanan", "Ketersediaan"])
+
+# Filter sesuai dropdown
+if aspek_filter == "Semua":
+    df_filtered = df_all[(df_all["Insight Pelayanan"] == "Pelayanan sangat baik") &
+                         (df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")]
+    st.markdown("✅ Apotek dengan **Pelayanan terbaik** & **Obat sangat lengkap**")
+elif aspek_filter == "Pelayanan":
+    df_filtered = df_all[df_all["Insight Pelayanan"] == "Pelayanan sangat baik"]
+    st.markdown("🏆 Apotek dengan **Pelayanan terbaik**")
+elif aspek_filter == "Ketersediaan":
+    df_filtered = df_all[df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau"]
+    st.markdown("💊 Apotek dengan **Obat sangat lengkap dan harga terjangkau**")
+
 
                 st.caption(f"Bobot → Pelayanan: {bobot_pelayanan}%, Ketersediaan: {bobot_harga}%, Jarak: {bobot_jarak}%")
 
@@ -169,34 +184,3 @@ if submit and alamat:
 
         else:
             st.error(f"❌ Lokasi tidak ditemukan: {geo_res['status']}")
-
-# Filter sesuai dropdown
-                if aspek_filter == "Semua":
-                    df_filtered = df_all[(df_all["Insight Pelayanan"] == "Pelayanan sangat baik") &
-                                         (df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")]
-                    st.markdown("✅ Apotek dengan **Pelayanan terbaik** & **Obat sangat lengkap**")
-                elif aspek_filter == "Pelayanan":
-                    df_filtered = df_all[df_all["Insight Pelayanan"] == "Pelayanan sangat baik"]
-                    st.markdown("🏆 Apotek dengan **Pelayanan terbaik**")
-                elif aspek_filter == "Ketersediaan":
-                    df_filtered = df_all[df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau"]
-                    st.markdown("💊 Apotek dengan **Obat sangat lengkap dan harga terjangkau**")
-                else:
-                    df_filtered = df_all
-
-                df_filtered = df_filtered.sort_values("topsis_score", ascending=False)[[
-                    "rank", "destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
-                    "Ketersediaan Obat dan Harga", "Insight Ketersediaan",
-                    "distance_text", "Skor Sentimen Keseluruhan", "topsis_score"
-                ]].rename(columns={
-                    "rank": "Rank",
-                    "destination": "Destination",
-                    "distance_text": "Jarak",
-                    "Skor Sentimen Keseluruhan": "Skor Sentimen",
-                    "topsis_score": "Nilai Topsis"
-                }).reset_index(drop=True)
-
-                if not df_filtered.empty:
-                    st.dataframe(df_filtered, use_container_width=True)
-                else:
-                    st.warning("❌ Tidak ada apotek yang memenuhi filter ini.")
