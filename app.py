@@ -6,39 +6,94 @@ import requests
 # === Konfigurasi Aplikasi ===
 st.set_page_config(page_title="Rekomendasi Apotek", layout="wide")
 st.title("🏥 Multi Criteria Decision Making (MCDM) Pemilihan Apotek Kota Palangka Raya")
+st.write("Metode yang digunakan: TOPSIS berbasis sentimen aspek dan jarak dari Google Maps API.")
 
-# === Fungsi TOPSIS ===
-def topsis(df, weights, benefit_criteria):
-    X = df.values
-    norm_X = X / np.sqrt((X**2).sum(axis=0))
-    weighted_X = norm_X * weights
-    ideal_best = np.max(weighted_X, axis=0) if benefit_criteria else np.min(weighted_X, axis=0)
-    ideal_worst = np.min(weighted_X, axis=0) if benefit_criteria else np.max(weighted_X, axis=0)
-    d_positive = np.sqrt(((weighted_X - ideal_best)**2).sum(axis=1))
-    d_negative = np.sqrt(((weighted_X - ideal_worst)**2).sum(axis=1))
-    scores = d_negative / (d_positive + d_negative)
-    return scores
+# === API Key Google Maps ===
+api_key = "AIzaSyBqMqXOO-8ZrsSPMQXMeUVYmG-zDHnKeL0"  
 
-# === Input Data Sentimen dan Jarak ===
-df_all = pd.read_csv("skor_sentimen_per_aspek_apotek.csv")
-df_all["distance_km"] = df_all["distance_text"].str.replace(" km", "").str.replace(",", ".").astype(float)
+# === Data Apotek ===
+apotek_list = [
+    "Apotek Alkes Galaksi", "Apotek Alkes Kahayan Farma", "Apotek Alkes Karet",
+    "Apotek Alkes Rajawali", "Apotek Alkes Sethadji", "Apotek Alkes Sisingamangaraja",
+    "Apotek Alkes Barokah", "Apotek Daoni", "Apotek K-24 Rajawali Sejahtera", "Apotek Kahanjak Medika",
+    "Apotek Kimia Farma Diponegoro Palangka Raya", "Apotek New Life", "Apotek Perintis Alkestama",
+    "Apotek Pontianak Palangka Raya", "Apotek Segar Palangka Raya"
+]
 
-# === Sidebar Input ===
-st.sidebar.header("🔍 Filter Pencarian Apotek")
+# === Sidebar: Bobot Kriteria ===
+st.sidebar.title("⚖️ Pengaturan Bobot Kriteria")
+bobot_mode = st.sidebar.radio("Pilih metode bobot:", ["Gunakan default", "Tentukan sendiri"])
 
-api_key = st.secrets["api_key"] if "api_key" in st.secrets else st.sidebar.text_input("🔑 Masukkan Google Maps API Key")
+if bobot_mode == "Gunakan default":
+    bobot_pelayanan = 45
+    bobot_harga = 25
+    bobot_jarak = 30
+    total_bobot = 100
+    valid_bobot = True
+    st.sidebar.markdown(f"""
+    **Bobot default:**
+    - Pelayanan dan Fasilitas: {bobot_pelayanan}%
+    - Ketersediaan Obat dan Harga: {bobot_harga}%
+    - Jarak: {bobot_jarak}%
+    """)
+else:
+    bobot_pelayanan = st.sidebar.slider("Pelayanan dan Fasilitas (%)", 0, 100, 33)
+    bobot_harga = st.sidebar.slider("Ketersediaan Obat dan Harga (%)", 0, 100, 33)
+    bobot_jarak = st.sidebar.slider("Jarak (%)", 0, 100, 34)
+    total_bobot = bobot_pelayanan + bobot_harga + bobot_jarak
 
-alamat = st.sidebar.text_input("📍 Masukkan Lokasi Anda")
-mode = st.sidebar.selectbox("🚗 Pilih Moda Transportasi", ["driving", "walking", "bicycling", "transit"])
-aspek_filter = st.sidebar.multiselect("🎯 Pilih Aspek Prioritas", ["Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga"], default=["Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga"])
-submit = st.sidebar.button("🔎 Cari dan Hitung Rekomendasi")
+    if total_bobot != 100:
+        st.sidebar.error(f"❌ Total bobot harus 100%, sekarang: {total_bobot}%")
+        valid_bobot = False
+    else:
+        st.sidebar.success("✅ Total bobot valid: 100%")
+        valid_bobot = True
 
-# === Fungsi Menampilkan Hasil Berdasarkan Filter Aspek ===
-def tampilkan_rekomendasi(df_tampil, judul):
-    st.subheader(judul)
-    st.dataframe(df_tampil[["nama_apotek", "alamat", "pelayanan_fasilitas", "ketersediaan_harga", "distance_km", "peringkat"]])
+# === Input Lokasi ===
+alamat = st.text_input("📍 Masukkan alamat Anda:", placeholder="Contoh: Universitas Palangka Raya")
+mode = st.selectbox("Pilih moda transportasi", ["driving", "two-wheeler", "walking"])
+submit = st.button("🔍 Cari dan Hitung Rekomendasi") if valid_bobot else None
 
-# === Jika Submit Ditekan ===
+# === Fungsi: Hitung jarak Google Maps ===
+def get_distance_duration(origin_latlon, destination, mode="driving", api_key=""):
+    endpoint = "https://maps.googleapis.com/maps/api/distancematrix/json"
+    params = {
+        "origins": origin_latlon,
+        "destinations": destination,
+        "mode": mode,
+        "key": api_key
+    }
+    response = requests.get(endpoint, params=params)
+    data = response.json()
+
+    if data["status"] != "OK" or data["rows"][0]["elements"][0]["status"] != "OK":
+        return {"destination": destination, "distance_text": None, "distance_meters": np.nan}
+
+    element = data["rows"][0]["elements"][0]
+    return {
+        "destination": destination,
+        "distance_text": element["distance"]["text"],
+        "distance_meters": element["distance"]["value"]
+    }
+
+# === Fungsi Insight ===
+def insight_pelayanan(skor):
+    if skor >= 88:
+        return "Pelayanan sangat baik"
+    elif skor >= 76:
+        return "Pelayanan baik"
+    else:
+        return "Pelayanan perlu ditingkatkan"
+
+def insight_ketersediaan(skor):
+    if skor >= 88:
+        return "Obat sangat lengkap harga terjangkau"
+    elif skor >= 76:
+        return "Obat cukup lengkap harga cukup terjangkau"
+    else:
+        return "Ketersediaan atau harga perlu ditingkatkan"
+
+# === Proses Perhitungan TOPSIS ===
 if submit and alamat:
     with st.spinner("🔎 Mendeteksi lokasi..."):
         geo_url = "https://maps.googleapis.com/maps/api/geocode/json"
@@ -50,33 +105,101 @@ if submit and alamat:
             origin = f"{location['lat']},{location['lng']}"
             st.success(f"✅ Lokasi ditemukan: {origin} (mode: {mode})")
 
-            # Hitung TOPSIS jika semua aspek dipilih
-            if set(aspek_filter) == {"Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga"}:
-                st.markdown("### 🔢 Hasil Rekomendasi Apotek Menyeluruh (TOPSIS)")
-                df_topsis = df_all.copy()
-                data_topsis = df_topsis[["pelayanan_fasilitas", "ketersediaan_harga", "distance_km"]]
-                weights = np.array([0.45, 0.25, 0.30])  # bobot default
-                benefit_criteria = [True, True, False]
-                df_topsis["peringkat"] = topsis(data_topsis, weights, benefit_criteria)
-                df_topsis = df_topsis.sort_values(by="peringkat", ascending=False)
-                tampilkan_rekomendasi(df_topsis, "🏥 Rekomendasi Apotek Terbaik Secara Menyeluruh")
+            results = [get_distance_duration(origin, apotek, mode=mode, api_key=api_key) for apotek in apotek_list]
+            df_jarak = pd.DataFrame(results)
 
-            # Jika hanya Pelayanan dipilih
-            elif aspek_filter == ["Pelayanan dan Fasilitas"]:
-                st.markdown("### 🧑‍⚕️ Rekomendasi Berdasarkan Pelayanan dan Fasilitas Terbaik")
-                df_pelayanan = df_all.sort_values(by="pelayanan_fasilitas", ascending=False)
-                df_pelayanan["peringkat"] = df_pelayanan["pelayanan_fasilitas"]
-                tampilkan_rekomendasi(df_pelayanan, "Apotek dengan Pelayanan dan Fasilitas Terbaik")
+            df_sentimen = pd.read_csv("data_skor_sentimen_per_aspek_apotek.csv")
+            df_sentimen["skor_total"] = df_sentimen["positive"] / df_sentimen["total_ulasan"]
+            df_skor_total = df_sentimen.groupby("apotek")["skor_total"].mean().reset_index()
+            df_skor_total = df_skor_total.rename(columns={"apotek": "destination", "skor_total": "Skor Sentimen Keseluruhan"})
 
-            # Jika hanya Ketersediaan dipilih
-            elif aspek_filter == ["Ketersediaan Obat dan Harga"]:
-                st.markdown("### 💊 Rekomendasi Berdasarkan Ketersediaan Obat dan Harga")
-                df_ketersediaan = df_all.sort_values(by="ketersediaan_harga", ascending=False)
-                df_ketersediaan["peringkat"] = df_ketersediaan["ketersediaan_harga"]
-                tampilkan_rekomendasi(df_ketersediaan, "Apotek dengan Ketersediaan Obat Terlengkap")
+            df_pivot = df_sentimen.pivot_table(index='apotek', columns='Dominant_Aspect',
+                                               values='skor_sentimen_positif', aggfunc='first').reset_index()
+            df_pivot = df_pivot.rename(columns={"apotek": "destination"})
 
-            # Jika tidak memilih apapun
+            df_all = pd.merge(df_jarak, df_pivot, on="destination", how="left")
+            df_all = pd.merge(df_all, df_skor_total, on="destination", how="left")
+            df_all = df_all.dropna(subset=["Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga", "distance_meters"])
+
+            if df_all.empty:
+                st.warning("⚠️ Tidak ada apotek dengan data lengkap.")
             else:
-                st.warning("⚠️ Silakan pilih minimal satu aspek untuk memfilter.")
+                df_all["Insight Pelayanan"] = df_all["Pelayanan dan Fasilitas"].apply(insight_pelayanan)
+                df_all["Insight Ketersediaan"] = df_all["Ketersediaan Obat dan Harga"].apply(insight_ketersediaan)
+
+                X = df_all[["Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga", "distance_meters"]].to_numpy().astype(float)
+                norm = np.linalg.norm(X, axis=0)
+                X_norm = X / norm
+
+                weights = np.array([
+                    bobot_pelayanan / 100,
+                    bobot_harga / 100,
+                    bobot_jarak / 100
+                ])
+
+                X_weighted = X_norm * weights
+
+                ideal_pos = [
+                    np.max(X_weighted[:, 0]),
+                    np.max(X_weighted[:, 1]),
+                    np.min(X_weighted[:, 2])
+                ]
+                ideal_neg = [
+                    np.min(X_weighted[:, 0]),
+                    np.min(X_weighted[:, 1]),
+                    np.max(X_weighted[:, 2])
+                ]
+
+                D_pos = np.linalg.norm(X_weighted - ideal_pos, axis=1)
+                D_neg = np.linalg.norm(X_weighted - ideal_neg, axis=1)
+                preference = D_neg / (D_pos + D_neg)
+
+                df_all["topsis_score"] = preference
+                df_all["rank"] = df_all["topsis_score"].rank(ascending=False).astype(int)
+
+                st.subheader("📊 Rekomendasi Apotek Terbaik")
+                st.caption(f"Bobot → Pelayanan: {bobot_pelayanan}%, Ketersediaan: {bobot_harga}%, Jarak: {bobot_jarak}%")
+
+                df_tampil = df_all.sort_values("topsis_score", ascending=False)[[
+                    "rank", "destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
+                    "Ketersediaan Obat dan Harga", "Insight Ketersediaan",
+                    "distance_text", "Skor Sentimen Keseluruhan", "topsis_score"
+                ]].rename(columns={
+                    "rank": "Rank",
+                    "destination": "Destination",
+                    "distance_text": "Jarak",
+                    "Skor Sentimen Keseluruhan": "Skor Sentimen",
+                    "topsis_score": "Nilai Topsis"
+                }).reset_index(drop=True)
+
+                st.dataframe(df_tampil, use_container_width=True)
+
+                # === Fitur Filtering ===
+                st.subheader("🔍 Filter Berdasarkan Aspek")
+                aspek = st.selectbox("Pilih aspek yang ingin difokuskan:", ["Semua", "Pelayanan", "Ketersediaan"])
+
+                if aspek == "Semua":
+                    st.markdown("### 🔍 Apotek dengan Pelayanan Sangat Baik & Obat Sangat Lengkap Harga Terjangkau")
+                    filter_all = df_all[
+                        (df_all["Insight Pelayanan"] == "Pelayanan sangat baik") &
+                        (df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")
+                    ].sort_values(by=["Pelayanan dan Fasilitas", "Ketersediaan Obat dan Harga"], ascending=False)
+
+                    if not filter_all.empty:
+                        st.dataframe(filter_all[["destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
+                                                 "Ketersediaan Obat dan Harga", "Insight Ketersediaan"]])
+                    else:
+                        st.info("Belum ada apotek yang memenuhi dua kriteria terbaik.")
+
+                elif aspek == "Pelayanan":
+                    st.markdown("### 🔍 Apotek dengan Pelayanan Terbaik")
+                    pelayanan_df = df_all.sort_values(by="Pelayanan dan Fasilitas", ascending=False)
+                    st.dataframe(pelayanan_df[["destination", "Pelayanan dan Fasilitas", "Insight Pelayanan"]])
+
+                elif aspek == "Ketersediaan":
+                    st.markdown("### 🔍 Apotek dengan Ketersediaan Obat Terbaik")
+                    ketersediaan_df = df_all.sort_values(by="Ketersediaan Obat dan Harga", ascending=False)
+                    st.dataframe(ketersediaan_df[["destination", "Ketersediaan Obat dan Harga", "Insight Ketersediaan"]])
+
         else:
             st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
