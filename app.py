@@ -212,8 +212,7 @@ if not filter_insight.empty:
                 **Skor TOPSIS:** {row['topsis_score']:.4f}
                 """)
             st.markdown("---")
-else:
+   else:
     st.info("🔎 Belum ada apotek yang memenuhi kedua kriteria tersebut.")
-
-        else:
-            st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
+else:
+ st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
