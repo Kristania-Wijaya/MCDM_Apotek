@@ -177,35 +177,36 @@ if submit and alamat:
         else:
             st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
 
-# === Fitur Filter Berdasarkan Hasil TOPSIS dan Aspek ===
-st.subheader("🔍 Lihat Apotek Berdasarkan Aspek (dari hasil TOPSIS)")
+# === Fitur Filter Mandiri Tanpa Lokasi ===
+st.subheader("🔍 Filter Berdasarkan Aspek")
+try:
+    df_all_simple = pd.read_csv("data_skor_sentimen_per_aspek_apotek.csv")
+    df_pivot_simple = df_all_simple.pivot_table(index='apotek', columns='Dominant_Aspect',
+                                                values='skor_sentimen_positif', aggfunc='first').reset_index()
+    df_pivot_simple = df_pivot_simple.rename(columns={"apotek": "destination"})
+    df_pivot_simple["Insight Pelayanan"] = df_pivot_simple["Pelayanan dan Fasilitas"].apply(insight_pelayanan)
+    df_pivot_simple["Insight Ketersediaan"] = df_pivot_simple["Ketersediaan Obat dan Harga"].apply(insight_ketersediaan)
 
-filter_aspek = st.radio("Urutkan berdasarkan aspek dominan:", ["Semua", "Pelayanan", "Ketersediaan"], horizontal=True)
+    aspek_pilihan = st.selectbox("Pilih aspek:", ["Semua", "Pelayanan", "Ketersediaan"])
 
-if filter_aspek == "Semua":
-    st.markdown("### ✅ Apotek dengan Skor TOPSIS Tertinggi (Semua Aspek)")
-    st.dataframe(df_tampil)
+    if aspek_pilihan == "Semua":
+        df_filt = df_pivot_simple[
+            (df_pivot_simple["Insight Pelayanan"] == "Pelayanan sangat baik") &
+            (df_pivot_simple["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")
+        ]
+        st.markdown("### ✅ Apotek dengan Pelayanan dan Ketersediaan Terbaik")
+        st.dataframe(df_filt[["destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
+                              "Ketersediaan Obat dan Harga", "Insight Ketersediaan"]])
 
-elif filter_aspek == "Pelayanan":
-    st.markdown("### 🏆 Apotek dengan Skor Pelayanan Tertinggi (dari hasil TOPSIS)")
-    df_sorted = df_all.sort_values(by=["Pelayanan dan Fasilitas", "topsis_score"], ascending=[False, False])
-    df_pelayanan = df_sorted[[ "destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
-                                "Ketersediaan Obat dan Harga", "Insight Ketersediaan",
-                                "distance_text", "Skor Sentimen Keseluruhan", "topsis_score" ]]
-    df_pelayanan = df_pelayanan.rename(columns={
-        "destination": "Destination", "distance_text": "Jarak", 
-        "Skor Sentimen Keseluruhan": "Skor Sentimen", "topsis_score": "Nilai Topsis"
-    }).reset_index(drop=True)
-    st.dataframe(df_pelayanan)
+    elif aspek_pilihan == "Pelayanan":
+        st.markdown("### ✅ Apotek Berdasarkan Pelayanan")
+        df_filt = df_pivot_simple.sort_values(by="Pelayanan dan Fasilitas", ascending=False)
+        st.dataframe(df_filt[["destination", "Pelayanan dan Fasilitas", "Insight Pelayanan"]])
 
-elif filter_aspek == "Ketersediaan":
-    st.markdown("### 💊 Apotek dengan Skor Ketersediaan Tertinggi (dari hasil TOPSIS)")
-    df_sorted = df_all.sort_values(by=["Ketersediaan Obat dan Harga", "topsis_score"], ascending=[False, False])
-    df_ketersediaan = df_sorted[[ "destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
-                                   "Ketersediaan Obat dan Harga", "Insight Ketersediaan",
-                                   "distance_text", "Skor Sentimen Keseluruhan", "topsis_score" ]]
-    df_ketersediaan = df_ketersediaan.rename(columns={
-        "destination": "Destination", "distance_text": "Jarak", 
-        "Skor Sentimen Keseluruhan": "Skor Sentimen", "topsis_score": "Nilai Topsis"
-    }).reset_index(drop=True)
-    st.dataframe(df_ketersediaan)
+    elif aspek_pilihan == "Ketersediaan":
+        st.markdown("### ✅ Apotek Berdasarkan Ketersediaan Obat")
+        df_filt = df_pivot_simple.sort_values(by="Ketersediaan Obat dan Harga", ascending=False)
+        st.dataframe(df_filt[["destination", "Ketersediaan Obat dan Harga", "Insight Ketersediaan"]])
+
+except Exception as e:
+    st.warning("❗ Gagal memuat data untuk filter aspek. Pastikan file CSV tersedia dan sesuai.")
