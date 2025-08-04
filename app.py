@@ -177,36 +177,45 @@ if submit and alamat:
         else:
             st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
 
-# === Fitur Filter Mandiri Tanpa Lokasi ===
-st.subheader("🔍 Filter Berdasarkan Aspek")
-try:
-    df_all_simple = pd.read_csv("data_skor_sentimen_per_aspek_apotek.csv")
-    df_pivot_simple = df_all_simple.pivot_table(index='apotek', columns='Dominant_Aspect',
-                                                values='skor_sentimen_positif', aggfunc='first').reset_index()
-    df_pivot_simple = df_pivot_simple.rename(columns={"apotek": "destination"})
-    df_pivot_simple["Insight Pelayanan"] = df_pivot_simple["Pelayanan dan Fasilitas"].apply(insight_pelayanan)
-    df_pivot_simple["Insight Ketersediaan"] = df_pivot_simple["Ketersediaan Obat dan Harga"].apply(insight_ketersediaan)
-
+# === Fitur Filter Mandiri Berdasarkan Aspek tapi Urutan tetap dari TOPSIS ===
+if 'df_all' in locals():
+    st.subheader("🔍 Filter Berdasarkan Aspek (Urut berdasarkan TOPSIS)")
     aspek_pilihan = st.selectbox("Pilih aspek:", ["Semua", "Pelayanan", "Ketersediaan"])
 
+    df_topsis_sorted = df_all.sort_values("topsis_score", ascending=False).copy()
+
     if aspek_pilihan == "Semua":
-        df_filt = df_pivot_simple[
-            (df_pivot_simple["Insight Pelayanan"] == "Pelayanan sangat baik") &
-            (df_pivot_simple["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")
+        df_filt = df_topsis_sorted[
+            (df_topsis_sorted["Insight Pelayanan"] == "Pelayanan sangat baik") &
+            (df_topsis_sorted["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")
         ]
-        st.markdown("### ✅ Apotek dengan Pelayanan dan Ketersediaan Terbaik")
-        st.dataframe(df_filt[["destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
-                              "Ketersediaan Obat dan Harga", "Insight Ketersediaan"]])
+        st.markdown("### ✅ Apotek dengan Pelayanan dan Ketersediaan Terbaik (urut berdasarkan TOPSIS)")
+        st.dataframe(df_filt[[
+            "destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
+            "Ketersediaan Obat dan Harga", "Insight Ketersediaan",
+            "Skor Sentimen", "Nilai Topsis"
+        ]].rename(columns={
+            "destination": "Apotek"
+        }), use_container_width=True)
 
     elif aspek_pilihan == "Pelayanan":
-        st.markdown("### ✅ Apotek Berdasarkan Pelayanan")
-        df_filt = df_pivot_simple.sort_values(by="Pelayanan dan Fasilitas", ascending=False)
-        st.dataframe(df_filt[["destination", "Pelayanan dan Fasilitas", "Insight Pelayanan"]])
+        df_filt = df_topsis_sorted[df_topsis_sorted["Insight Pelayanan"] == "Pelayanan sangat baik"]
+        st.markdown("### ✅ Apotek Berdasarkan Pelayanan (urut berdasarkan TOPSIS)")
+        st.dataframe(df_filt[[
+            "destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
+            "Skor Sentimen", "Nilai Topsis"
+        ]].rename(columns={
+            "destination": "Apotek"
+        }), use_container_width=True)
 
     elif aspek_pilihan == "Ketersediaan":
-        st.markdown("### ✅ Apotek Berdasarkan Ketersediaan Obat")
-        df_filt = df_pivot_simple.sort_values(by="Ketersediaan Obat dan Harga", ascending=False)
-        st.dataframe(df_filt[["destination", "Ketersediaan Obat dan Harga", "Insight Ketersediaan"]])
-
-except Exception as e:
-    st.warning("❗ Gagal memuat data untuk filter aspek. Pastikan file CSV tersedia dan sesuai.")
+        df_filt = df_topsis_sorted[df_topsis_sorted["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau"]
+        st.markdown("### ✅ Apotek Berdasarkan Ketersediaan Obat (urut berdasarkan TOPSIS)")
+        st.dataframe(df_filt[[
+            "destination", "Ketersediaan Obat dan Harga", "Insight Ketersediaan",
+            "Skor Sentimen", "Nilai Topsis"
+        ]].rename(columns={
+            "destination": "Apotek"
+        }), use_container_width=True)
+else:
+    st.info("Masukkan alamat terlebih dahulu untuk menggunakan filter berbasis TOPSIS.")
