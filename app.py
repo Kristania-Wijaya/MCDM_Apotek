@@ -148,37 +148,40 @@ if submit and alamat:
                 df_all["topsis_score"] = preference
                 df_all["rank"] = df_all["topsis_score"].rank(ascending=False).astype(int)
 
-                st.subheader("📊 Rekomendasi Apotek Terbaik")
-                st.caption(f"Bobot → Pelayanan: {bobot_pelayanan}%, Ketersediaan: {bobot_harga}%, Jarak: {bobot_jarak}%")
-                
-# 🔽 Tambahkan dropdown filter di sini
-aspek_filter = st.selectbox("🔽 Filter rekomendasi berdasarkan aspek:", ["Semua", "Pelayanan", "Ketersediaan"])
+               st.subheader("📊 Rekomendasi Apotek Terbaik")
+               st.caption(f"Bobot → Pelayanan: {bobot_pelayanan}%, Ketersediaan: {bobot_harga}%, Jarak: {bobot_jarak}%")
 
-# Filter sesuai dropdown
+               # 🔽 Tambahkan dropdown filter di sini
+               aspek_filter = st.selectbox("🔽 Filter rekomendasi berdasarkan aspek:", ["Semua", "Pelayanan", "Ketersediaan"])
+
+               # Filter sesuai pilihan dropdown
 if aspek_filter == "Semua":
-df_filtered = df_all[(df_all["Insight Pelayanan"] == "Pelayanan sangat baik") &
-                 (df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")]
-st.markdown("✅ Apotek dengan **Pelayanan terbaik** & **Obat sangat lengkap**")
+    df_filtered = df_all[
+        (df_all["Insight Pelayanan"] == "Pelayanan sangat baik") &
+        (df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau")
+    ]
+    st.markdown("✅ Apotek dengan **Pelayanan terbaik** & **Obat sangat lengkap**")
 elif aspek_filter == "Pelayanan":
-df_filtered = df_all[df_all["Insight Pelayanan"] == "Pelayanan sangat baik"]
-st.markdown("🏆 Apotek dengan **Pelayanan terbaik**")
+    df_filtered = df_all[df_all["Insight Pelayanan"] == "Pelayanan sangat baik"]
+    st.markdown("🏆 Apotek dengan **Pelayanan terbaik**")
 elif aspek_filter == "Ketersediaan":
-df_filtered = df_all[df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau"]
-st.markdown("💊 Apotek dengan **Obat sangat lengkap dan harga terjangkau**")
+    df_filtered = df_all[df_all["Insight Ketersediaan"] == "Obat sangat lengkap harga terjangkau"]
+    st.markdown("💊 Apotek dengan **Obat sangat lengkap dan harga terjangkau**")
 
-                    df_tampil = df_filtered.sort_values("topsis_score", ascending=False)[[
-                    "rank", "destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
-                    "Ketersediaan Obat dan Harga", "Insight Ketersediaan",
-                    "distance_text", "Skor Sentimen Keseluruhan", "topsis_score"
-                ]].rename(columns={
-                    "rank": "Rank",
-                    "destination": "Destination",
-                    "distance_text": "Jarak",
-                    "Skor Sentimen Keseluruhan": "Skor Sentimen",
-                    "topsis_score": "Nilai Topsis"
-                }).reset_index(drop=True)
+# Tampilkan tabel hasil rekomendasi
+df_tampil = df_filtered.sort_values("topsis_score", ascending=False)[[
+    "rank", "destination", "Pelayanan dan Fasilitas", "Insight Pelayanan",
+    "Ketersediaan Obat dan Harga", "Insight Ketersediaan",
+    "distance_text", "Skor Sentimen Keseluruhan", "topsis_score"
+]].rename(columns={
+    "rank": "Rank",
+    "destination": "Destination",
+    "distance_text": "Jarak",
+    "Skor Sentimen Keseluruhan": "Skor Sentimen",
+    "topsis_score": "Nilai Topsis"
+}).reset_index(drop=True)
 
-                st.dataframe(df_tampil, use_container_width=True)
+st.dataframe(df_tampil, use_container_width=True)
 
         else:
             st.error("❌ Lokasi tidak ditemukan. Silakan masukkan alamat yang valid.")
