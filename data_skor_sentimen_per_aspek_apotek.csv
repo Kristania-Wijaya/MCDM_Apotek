@@ -1,0 +1,31 @@
+apotek,Dominant_Aspect,positive,negative,total_ulasan,skor_sentimen_positif,skor_sentimen_negatif
+Apotek Alkes Barokah,Ketersediaan Obat dan Harga,16.0,1.0,17.0,94.12,5.88
+Apotek Alkes Barokah,Pelayanan dan Fasilitas,36.0,0.0,36.0,100.0,0.0
+Apotek Alkes Galaksi,Ketersediaan Obat dan Harga,14.0,0.0,14.0,100.0,0.0
+Apotek Alkes Galaksi,Pelayanan dan Fasilitas,22.0,3.0,25.0,88.0,12.0
+Apotek Alkes Kahayan Farma,Ketersediaan Obat dan Harga,6.0,0.0,6.0,100.0,0.0
+Apotek Alkes Kahayan Farma,Pelayanan dan Fasilitas,15.0,2.0,17.0,88.24,11.76
+Apotek Alkes Karet,Ketersediaan Obat dan Harga,5.0,0.0,5.0,100.0,0.0
+Apotek Alkes Karet,Pelayanan dan Fasilitas,12.0,6.0,18.0,66.67,33.33
+Apotek Alkes Rajawali,Ketersediaan Obat dan Harga,9.0,1.0,10.0,90.0,10.0
+Apotek Alkes Rajawali,Pelayanan dan Fasilitas,20.0,5.0,25.0,80.0,20.0
+Apotek Alkes Sethadji,Ketersediaan Obat dan Harga,5.0,0.0,5.0,100.0,0.0
+Apotek Alkes Sethadji,Pelayanan dan Fasilitas,13.0,4.0,17.0,76.47,23.53
+Apotek Alkes Sisingamangaraja,Ketersediaan Obat dan Harga,10.0,0.0,10.0,100.0,0.0
+Apotek Alkes Sisingamangaraja,Pelayanan dan Fasilitas,39.0,1.0,40.0,97.5,2.5
+Apotek Daoni,Ketersediaan Obat dan Harga,3.0,1.0,4.0,75.0,25.0
+Apotek Daoni,Pelayanan dan Fasilitas,23.0,8.0,31.0,74.19,25.81
+Apotek K-24 Rajawali Sejahtera,Ketersediaan Obat dan Harga,7.0,0.0,7.0,100.0,0.0
+Apotek K-24 Rajawali Sejahtera,Pelayanan dan Fasilitas,19.0,10.0,29.0,65.52,34.48
+Apotek Kahanjak Medika,Ketersediaan Obat dan Harga,13.0,0.0,13.0,100.0,0.0
+Apotek Kahanjak Medika,Pelayanan dan Fasilitas,114.0,1.0,115.0,99.13,0.87
+Apotek Kimia Farma Diponegoro Palangka Raya,Ketersediaan Obat dan Harga,7.0,4.0,11.0,63.64,36.36
+Apotek Kimia Farma Diponegoro Palangka Raya,Pelayanan dan Fasilitas,19.0,6.0,25.0,76.0,24.0
+Apotek New Life,Ketersediaan Obat dan Harga,13.0,0.0,13.0,100.0,0.0
+Apotek New Life,Pelayanan dan Fasilitas,17.0,0.0,17.0,100.0,0.0
+Apotek Perintis Alkestama,Ketersediaan Obat dan Harga,19.0,0.0,19.0,100.0,0.0
+Apotek Perintis Alkestama,Pelayanan dan Fasilitas,36.0,7.0,43.0,83.72,16.28
+Apotek Pontianak Palangka Raya,Ketersediaan Obat dan Harga,9.0,0.0,9.0,100.0,0.0
+Apotek Pontianak Palangka Raya,Pelayanan dan Fasilitas,6.0,7.0,13.0,46.15,53.85
+Apotek Segar Palangka Raya,Ketersediaan Obat dan Harga,50.0,4.0,54.0,92.59,7.41
+Apotek Segar Palangka Raya,Pelayanan dan Fasilitas,18.0,20.0,38.0,47.37,52.63
